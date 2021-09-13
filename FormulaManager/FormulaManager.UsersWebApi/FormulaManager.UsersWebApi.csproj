@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FormulaManager.BusinessLogic.Repository\FormulaManager.BusinessLogic.Repository.csproj" />
+    <ProjectReference Include="..\FormulaManager.BusinessLogic.Services\FormulaManager.BusinessLogic.Services.csproj" />
+    <ProjectReference Include="..\FormulaManager.DAL.Entities\FormulaManager.DAL.Entities.csproj" />
+  </ItemGroup>
+
+</Project>

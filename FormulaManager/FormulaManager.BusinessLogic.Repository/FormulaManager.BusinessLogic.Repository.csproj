@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FormulaManager.DAL.Entities\FormulaManager.DAL.Entities.csproj" />
+    <ProjectReference Include="..\FormulaManager.DAL.Persistance\FormulaManager.DAL.Persistance.csproj" />
+  </ItemGroup>
+
+</Project>
