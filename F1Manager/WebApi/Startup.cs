@@ -1,4 +1,7 @@
-using Infrastructure;
+using AutoMapper;
+using Infrastructure.DataAccess;
+using Infrastructure.UnitOfWorks.Users;
+using WebApi.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApi.Mappers;
 
 namespace WebApi
 {
@@ -36,6 +40,11 @@ namespace WebApi
             services.AddControllers();
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=f1m;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"),
             ServiceLifetime.Transient);
+
+           services.AddMapperConfiguration();
+
+            services.AddScoped<IUsersUoW, UsersUoW>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

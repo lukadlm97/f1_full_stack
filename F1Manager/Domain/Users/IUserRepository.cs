@@ -9,7 +9,7 @@ namespace Domain.Users
         Task<List<User>> GetObjectByName(string value);
         Task<User> GetByID(long id);
         Task<bool> UserExists(string username);
-        Task<User> Register(User employee, string password);
+        Task<User> Register(User newUser, string password);
         Task<User> Login(string username, string password);
         Task<User> GetObjectByUsername(string username);
     }

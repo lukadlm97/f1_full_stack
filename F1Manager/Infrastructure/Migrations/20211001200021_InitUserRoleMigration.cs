@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Migrations
 {
-    public partial class UserRoleMigration : Migration
+    public partial class InitUserRoleMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
