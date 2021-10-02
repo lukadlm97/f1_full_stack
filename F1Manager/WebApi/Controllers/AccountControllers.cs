@@ -6,10 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WebApi.DTOs;
+using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -35,9 +37,9 @@ namespace WebApi.Controllers
             var users = await this.userUoW.Users.GetAll();
 
             if (users == null)
-                return NotFound("No register users.");
+                return NotFound("No registered users.");
 
-            return Ok(users);
+            return Ok(users.Select(x=>this.mapper.Map<SingleAcountView>(x)));
         }
 
         // GET: api/account/login
@@ -73,11 +75,11 @@ namespace WebApi.Controllers
             return Ok(new
             {
                 token = tokenHandler.WriteToken(token),
-                employee = userDb
+                employee = this.mapper.Map<LoginView>(userDb)
             });
         }
 
-        // GET: api/account/register
+        // POST: api/account/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDto user)
         {
@@ -86,9 +88,46 @@ namespace WebApi.Controllers
 
             if (countOfChanges != 0)
             {
-                return Ok(createdUser);
+                return Ok(this.mapper.Map<RegistrationView>(createdUser));
             }
             return BadRequest();
         }
+
+
+        // POST: api/account/create
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateUser([FromBody] ContentWriterDto user)
+        {
+            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
+            var countOfChanges = await this.userUoW.Commit();
+
+            if (countOfChanges != 0)
+            {
+                var createdContentWriter = this.mapper.Map<AdminRegistrationView>(createdUser);
+                createdContentWriter.Password = user.Password;
+
+                return Ok(createdContentWriter);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] ContentWriterUpdateDto user)
+        {
+            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
+            var countOfChanges = await this.userUoW.Commit();
+
+            if (countOfChanges != 0)
+            {
+                var createdContentWriter = this.mapper.Map<AdminRegistrationView>(createdUser);
+                createdContentWriter.Password = user.Password;
+
+                return Ok(createdContentWriter);
+            }
+
+            return BadRequest();
+        }
+
     }
 }

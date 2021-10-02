@@ -26,7 +26,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
-                return await context.Users.ToListAsync();
+                return await context.Users.Where(x => !x.IsDeleted).Include(x => x.Role).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -81,7 +81,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
-                var user = await context.Set<User>().FirstOrDefaultAsync(x => x.UserName == username);
+                var user = await context.Set<User>().FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
                 if (user == null)
                     return null;
                 if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
@@ -99,6 +99,11 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
+                if (await UserExists(newUser.UserName))
+                {
+                    return null;
+                }
+
                 byte[] passwordHash, passwordSalt;
                 CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
@@ -122,7 +127,7 @@ namespace Infrastructure.DataAccess.Repositores
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(User entity)
+        public  Task<bool> Update(User entity)
         {
             throw new NotImplementedException();
         }
@@ -131,7 +136,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
-                if (await context.Set<User>().AnyAsync(x => x.UserName == username))
+                if (await context.Set<User>().AnyAsync(x => x.UserName == username && !x.IsDeleted))
                     return true;
                 return false;
             }

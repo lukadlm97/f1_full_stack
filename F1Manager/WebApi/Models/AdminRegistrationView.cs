@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi.DTOs
+namespace WebApi.Models
 {
-    public class UserDto
+    public class AdminRegistrationView
     {
-        public long Id { get; set; }
-        public string UserName { get; set; }
+        public long UserId { get; set; }
+        public string Username { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Email { get; set; }
-        public long RoleId { get; set; } = 0;
+        public string Role { get; set; }
     }
 }
