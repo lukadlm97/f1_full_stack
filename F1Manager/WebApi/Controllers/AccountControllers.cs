@@ -1,33 +1,41 @@
 ﻿using AutoMapper;
 using Domain.Users;
 using Infrastructure.UnitOfWorks.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.AuthorizationAssets;
 using WebApi.DTOs;
 using WebApi.Models;
+using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
+    [Authorize(Policy = "CanViewUsers")]
     [Route("api/account")]
     [ApiController]
     public class AccountControllers : ControllerBase
     {
         private readonly IUsersUoW userUoW;
-        private readonly IConfiguration config;
         private readonly IMapper mapper;
+        private readonly JwtIssuerOptions jwtOptions;
+        private readonly IJwtFactory jwtFactory;
 
-        public AccountControllers(IUsersUoW userUoW, IConfiguration config,IMapper mapper)
+        public AccountControllers(IUsersUoW userUoW, IConfiguration config,IMapper mapper, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
         {
             this.userUoW = userUoW;
-            this.config = config;
+            this.jwtFactory = jwtFactory;
             this.mapper = mapper;
+            this.jwtOptions = jwtOptions.Value;
         }
 
         // GET: api/account/users
@@ -43,40 +51,37 @@ namespace WebApi.Controllers
         }
 
         // GET: api/account/login
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]LoginDto user)
         {
-            var userDb = await this.userUoW.Users.Login(user.UserName.ToLower(), user.Password.ToLower());
-            if (userDb == null)
+            var identity = await GetClaimsIdentity(user.UserName, user.Password);
+            if (identity == null)
                 return Unauthorized();
 
-            var claims = new[]
+            var jwt = await Tokens.GenerateJwt(identity, jwtFactory, user.UserName, jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+            return new OkObjectResult(jwt);
+        }
+
+        private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
+        {
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                return await Task.FromResult<ClaimsIdentity>(null);
+
+            // get the user to verifty
+            var userToVerify = await this.userUoW.Users.GetObjectByUsername(userName);
+
+            if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);
+
+            // check the credentials
+            if (await this.userUoW.Users.Login(userToVerify.UserName.ToLower(), password.ToLower())!=null)
             {
-               new Claim(ClaimTypes.NameIdentifier, userDb.Id.ToString()),
-               new Claim(ClaimTypes.Name, userDb.UserName)
-            };
+                return await Task.FromResult(jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString()));
+            }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.
-                GetBytes(this.config.GetSection("AppSettings:Token").Value));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = credentials
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Ok(new
-            {
-                token = tokenHandler.WriteToken(token),
-                employee = this.mapper.Map<LoginView>(userDb)
-            });
+            // Credentials are invalid, or account doesn't exist
+            return await Task.FromResult<ClaimsIdentity>(null);
         }
 
         // POST: api/account/register

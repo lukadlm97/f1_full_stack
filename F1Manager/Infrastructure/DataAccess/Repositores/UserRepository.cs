@@ -81,7 +81,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
-                var user = await context.Set<User>().FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
+                var user = await context.Set<User>().Include(x=>x.Role).FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
                 if (user == null)
                     return null;
                 if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
