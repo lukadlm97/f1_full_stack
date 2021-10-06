@@ -2,16 +2,14 @@
 using Domain.Users;
 using Infrastructure.UnitOfWorks.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using WebApi.AuthorizationAssets;
 using WebApi.DTOs;
@@ -27,14 +25,16 @@ namespace WebApi.Controllers
     {
         private readonly IUsersUoW userUoW;
         private readonly IMapper mapper;
+        private readonly ClaimsPrincipal caller;
         private readonly JwtIssuerOptions jwtOptions;
         private readonly IJwtFactory jwtFactory;
 
-        public AccountControllers(IUsersUoW userUoW, IConfiguration config,IMapper mapper, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AccountControllers(IUsersUoW userUoW, IConfiguration config, IMapper mapper, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IHttpContextAccessor httpContextAccessor)
         {
             this.userUoW = userUoW;
             this.jwtFactory = jwtFactory;
             this.mapper = mapper;
+            this.caller = httpContextAccessor.HttpContext.User;
             this.jwtOptions = jwtOptions.Value;
         }
 
@@ -47,13 +47,25 @@ namespace WebApi.Controllers
             if (users == null)
                 return NotFound("No registered users.");
 
-            return Ok(users.Select(x=>this.mapper.Map<SingleAcountView>(x)));
+            return Ok(users.Select(x => this.mapper.Map<SingleAcountView>(x)));
+        }
+
+        // GET: api/account/home
+        // TODO remove this becouse this is init state for all roles
+        [AllowAnonymous]
+        [HttpGet("home")]
+        public async Task<IActionResult> Home()
+        {
+            var userId = caller.Claims.SingleOrDefault(x => x.Type == "id");
+            var user = await this.userUoW.Users.GetByID(Convert.ToInt32(userId.Value));
+
+            return new OkObjectResult(mapper.Map<LoginView>(user));
         }
 
         // GET: api/account/login
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody]LoginDto user)
+        public async Task<IActionResult> Login([FromBody] LoginDto user)
         {
             var identity = await GetClaimsIdentity(user.UserName, user.Password);
             if (identity == null)
@@ -75,9 +87,10 @@ namespace WebApi.Controllers
             if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);
 
             // check the credentials
-            if (await this.userUoW.Users.Login(userToVerify.UserName.ToLower(), password.ToLower())!=null)
+            var user = await this.userUoW.Users.Login(userToVerify.UserName.ToLower(), password.ToLower());
+            if (user != null)
             {
-                return await Task.FromResult(jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString()));
+                return await Task.FromResult(jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString(), user.Role.RoleName));
             }
 
             // Credentials are invalid, or account doesn't exist
@@ -85,10 +98,11 @@ namespace WebApi.Controllers
         }
 
         // POST: api/account/register
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDto user)
         {
-            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user),user.Password.ToLower());
+            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
             var countOfChanges = await this.userUoW.Commit();
 
             if (countOfChanges != 0)
@@ -98,12 +112,16 @@ namespace WebApi.Controllers
             return BadRequest();
         }
 
-
         // POST: api/account/create
         [HttpPost("create")]
         public async Task<IActionResult> CreateUser([FromBody] ContentWriterDto user)
         {
-            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
+            var adminUsername = caller.Claims.SingleOrDefault(x => x.Type ==
+                                                                $"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            var newUser = mapper.Map<User>(user);
+            newUser.CreatedBy = adminUsername.Value.ToString();
+
+            var createdUser = await this.userUoW.Users.Register(newUser, user.Password.ToLower());
             var countOfChanges = await this.userUoW.Commit();
 
             if (countOfChanges != 0)
@@ -117,22 +135,27 @@ namespace WebApi.Controllers
             return BadRequest();
         }
 
-        [HttpPost("update")]
+        // PUT: api/account/update
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateUser([FromBody] ContentWriterUpdateDto user)
         {
-            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
+            var adminUsername = caller.Claims.SingleOrDefault(x => x.Type ==
+                                                                $"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            var newUser = mapper.Map<User>(user);
+            newUser.UpdatedBy = adminUsername.Value.ToString();
+
+            var createdUser = await this.userUoW.Users.UpdateDetails(user.Id, newUser, user.Password.ToLower());
             var countOfChanges = await this.userUoW.Commit();
 
             if (countOfChanges != 0)
             {
-                var createdContentWriter = this.mapper.Map<AdminRegistrationView>(createdUser);
-                createdContentWriter.Password = user.Password;
+                var updatedContentWriter = this.mapper.Map<AdminRegistrationView>(createdUser);
+                updatedContentWriter.Password = user.Password;
 
-                return Ok(createdContentWriter);
+                return Ok(updatedContentWriter);
             }
 
             return BadRequest();
         }
-
     }
 }

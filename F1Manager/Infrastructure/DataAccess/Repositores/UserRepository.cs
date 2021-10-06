@@ -170,5 +170,40 @@ namespace Infrastructure.DataAccess.Repositores
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
+
+        public async Task<User> UpdateDetails(long id, User newUser,string password)
+        {
+            try
+            {
+                var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+                if (existingUser==null)
+                {
+                    return null;
+                }
+
+                existingUser.Name = newUser.Name;
+                existingUser.Surname = newUser.Surname;
+                existingUser.UserName = newUser.UserName;
+                existingUser.Email = newUser.Email;
+                existingUser.UpdatedBy = newUser.UpdatedBy;
+                existingUser.UpdatedDate = newUser.UpdatedDate;
+
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+                existingUser.PasswordHash = passwordHash;
+                existingUser.PasswordSalt = passwordSalt;
+                existingUser.Role = await context.Roles.FirstOrDefaultAsync(x => x.Id == newUser.RoleId);
+
+                var entry =  context.Users.Update(existingUser);
+
+                return entry.Entity;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(">>>> " + ex.Message);
+                return null;
+            }
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -26,7 +24,7 @@ namespace WebApi.AuthorizationAssets
                  new Claim(JwtRegisteredClaimNames.Sub, userName),
                  new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
                  new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst(Utilities.Constants.Strings.JwtClaimIdentifiers.Rol),
+                 identity.FindFirst(Utilities.Constants.Strings.JwtClaimIdentifiers.Role),
                  identity.FindFirst(Utilities.Constants.Strings.JwtClaimIdentifiers.Id)
              };
 
@@ -44,13 +42,24 @@ namespace WebApi.AuthorizationAssets
             return encodedJwt;
         }
 
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
+        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, string roleName)
         {
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+            switch (roleName.ToLower())
             {
-                new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Rol, Utilities.Constants.Strings.JwtClaims.ApiAccess)
-            });
+                case "admin":
+                    return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+                        {
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Role, Utilities.Constants.Strings.JwtClaims.Admin)
+                        });
+
+                default:
+                    return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+                        {
+                                new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
+                                new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Role, Utilities.Constants.Strings.JwtClaims.User)
+                            });
+            }
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

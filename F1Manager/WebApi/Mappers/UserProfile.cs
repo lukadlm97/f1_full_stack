@@ -16,6 +16,7 @@ namespace WebApi.Mappers
                         .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.Now))
                         .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.AdminName));
             CreateMap<ContentWriterUpdateDto, User>()
+                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId == 0 ? 3 : src.RoleId))
                         .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => DateTime.Now))
                         .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom(src => src.AdminName));
 
