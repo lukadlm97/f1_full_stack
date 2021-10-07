@@ -13,5 +13,6 @@ namespace Domain.Users
         Task<User> Login(string username, string password);
         Task<User> GetObjectByUsername(string username);
         Task<User> UpdateDetails(long id, User newUser,string password);
+        Task<bool> VerifyAccount(User user, string password);
     }
 }

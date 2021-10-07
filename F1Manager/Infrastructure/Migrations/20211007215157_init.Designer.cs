@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211005200959_AddVerificationColumnMigration")]
-    partial class AddVerificationColumnMigration
+    [Migration("20211007215157_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,39 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "3.1.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Domain.Countries.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("GDPPerCapita")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("KeggleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("NominalGDP")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Population")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ShareIfWorldGDP")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
 
             modelBuilder.Entity("Domain.Roles.Role", b =>
                 {
@@ -45,6 +78,9 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -85,7 +121,15 @@ namespace Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("VerificationCode")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("VerificationDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("RoleId");
 
@@ -94,6 +138,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Users.User", b =>
                 {
+                    b.HasOne("Domain.Countries.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Roles.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")

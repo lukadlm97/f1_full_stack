@@ -1,4 +1,6 @@
-﻿using Domain.Roles;
+﻿
+using Domain.Countries;
+using Domain.Roles;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,7 @@ namespace Infrastructure.DataAccess
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Country> Countries{ get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -20,6 +23,7 @@ namespace Infrastructure.DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().HasOne(x => x.Country);
         }
     }
 }

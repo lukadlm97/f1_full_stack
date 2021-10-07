@@ -11,7 +11,8 @@ namespace WebApi.Mappers
         public UserProfile()
         {
             CreateMap<UserDto, User>().ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId == 0 ? 4 : src.RoleId))
-                        .ForMember(dest =>dest.CreatedDate,opt=>opt.MapFrom(src=>DateTime.Now));
+                        .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.Now))
+                        .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.CountryId == 0 ? 3 : src.CountryId));
             CreateMap<ContentWriterDto, User>().ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId == 0 ? 3 : src.RoleId))
                         .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.Now))
                         .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.AdminName));
@@ -19,6 +20,7 @@ namespace WebApi.Mappers
                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId == 0 ? 3 : src.RoleId))
                         .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => DateTime.Now))
                         .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom(src => src.AdminName));
+            CreateMap<VerificationDto, User>();
 
             CreateMap<User, SingleAcountView>().ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.RoleName))
                                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));

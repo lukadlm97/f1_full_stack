@@ -52,7 +52,18 @@ namespace WebApi.AuthorizationAssets
                             new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
                             new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Role, Utilities.Constants.Strings.JwtClaims.Admin)
                         });
-
+                case "contentwriter":
+                    return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+                        {
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Role, Utilities.Constants.Strings.JwtClaims.ContentWriter)
+                        });
+                case "premiumuser":
+                    return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+                        {
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Id, id),
+                            new Claim(Utilities.Constants.Strings.JwtClaimIdentifiers.Role, Utilities.Constants.Strings.JwtClaims.PremiumUser)
+                        });
                 default:
                     return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
                         {

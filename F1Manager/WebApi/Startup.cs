@@ -90,6 +90,7 @@ namespace WebApi
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("CanViewUsers", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin));
+                options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
                 //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));
             });
 

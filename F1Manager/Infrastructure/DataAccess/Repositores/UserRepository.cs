@@ -1,4 +1,5 @@
 ﻿using Domain.Users;
+using Domain.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace Infrastructure.DataAccess.Repositores
     public class UserRepository : IUserRepository
     {
         private readonly AppDbContext context;
+        private readonly RandomGenerator randomGenerator;
 
         public UserRepository(AppDbContext dbContext)
         {
             this.context = dbContext;
+            this.randomGenerator = new RandomGenerator();
         }
 
         public Task<bool> Delete(User entity)
@@ -110,6 +113,8 @@ namespace Infrastructure.DataAccess.Repositores
                 newUser.PasswordHash = passwordHash;
                 newUser.PasswordSalt = passwordSalt;
                 newUser.Role = await context.Roles.FirstOrDefaultAsync(x => x.Id == newUser.RoleId);
+                newUser.VerificationCode = randomGenerator.GenerateVerificationCode();
+                newUser.Country = await context.Countries.FirstOrDefaultAsync(x => x.Id == newUser.CountryId);
 
                 var entry = await context.Users.AddAsync(newUser);
 
@@ -203,6 +208,39 @@ namespace Infrastructure.DataAccess.Repositores
             {
                 Debug.WriteLine(">>>> " + ex.Message);
                 return null;
+            }
+        }
+
+        public async Task<bool> VerifyAccount(User user,string password)
+        {
+            try
+            {
+                var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == user.Id);
+                if (existingUser == null)
+                {
+                    return false;
+                }
+
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+                if(!VerifyPasswordHash(password,existingUser.PasswordHash,existingUser.PasswordSalt))
+                {
+                    return false;
+                }
+
+                existingUser.IsVerified = true;
+                existingUser.VerificationCode = 0;
+                existingUser.VerificationDate = DateTime.Now;
+
+                context.Users.Update(existingUser);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(">>>> " + ex.Message);
+                return false; ;
             }
         }
     }

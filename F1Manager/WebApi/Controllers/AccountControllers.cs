@@ -50,17 +50,7 @@ namespace WebApi.Controllers
             return Ok(users.Select(x => this.mapper.Map<SingleAcountView>(x)));
         }
 
-        // GET: api/account/home
-        // TODO remove this becouse this is init state for all roles
-        [AllowAnonymous]
-        [HttpGet("home")]
-        public async Task<IActionResult> Home()
-        {
-            var userId = caller.Claims.SingleOrDefault(x => x.Type == "id");
-            var user = await this.userUoW.Users.GetByID(Convert.ToInt32(userId.Value));
-
-            return new OkObjectResult(mapper.Map<LoginView>(user));
-        }
+        
 
         // GET: api/account/login
         [AllowAnonymous]
@@ -108,6 +98,24 @@ namespace WebApi.Controllers
             if (countOfChanges != 0)
             {
                 return Ok(this.mapper.Map<RegistrationView>(createdUser));
+            }
+            return BadRequest();
+        }
+
+        // POST: api/account/verify
+        [AllowAnonymous]
+        [HttpPost("verify")]
+        public async Task<IActionResult> Verify([FromBody] VerificationDto user)
+        {
+            await this.userUoW.Users.VerifyAccount(mapper.Map<User>(user),user.Password);
+            var countOfChanges = await this.userUoW.Commit();
+
+            if (countOfChanges != 0)
+            {
+                return Ok(new VerificationView
+                {
+                    Message="success"
+                });
             }
             return BadRequest();
         }

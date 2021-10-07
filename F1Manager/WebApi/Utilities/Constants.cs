@@ -17,6 +17,8 @@ namespace WebApi.Utilities
             public static class JwtClaims
             {
                 public const string Admin = "admin_access";
+                public const string ContentWriter = "cw_access";
+                public const string PremiumUser = "pu_access";
                 public const string User = "user_access";
             }
         }
