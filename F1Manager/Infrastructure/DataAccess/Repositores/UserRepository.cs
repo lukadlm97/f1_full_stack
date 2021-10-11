@@ -221,9 +221,6 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
                 }
 
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
-
                 if(!VerifyPasswordHash(password,existingUser.PasswordHash,existingUser.PasswordSalt))
                 {
                     return false;

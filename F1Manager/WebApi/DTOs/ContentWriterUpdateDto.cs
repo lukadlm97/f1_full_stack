@@ -8,5 +8,7 @@ namespace WebApi.DTOs
     public class ContentWriterUpdateDto:UserDto
     {
         public string AdminName { get; set; }
+
+        public int CountryId { get; set; } = 0;
     }
 }
