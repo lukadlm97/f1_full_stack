@@ -84,7 +84,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             try
             {
-                var user = await context.Set<User>().Include(x=>x.Role).FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
+                var user = await context.Set<User>().Include(x => x.Role).FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
                 if (user == null)
                     return null;
                 if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
@@ -132,7 +132,7 @@ namespace Infrastructure.DataAccess.Repositores
             throw new NotImplementedException();
         }
 
-        public  Task<bool> Update(User entity)
+        public Task<bool> Update(User entity)
         {
             throw new NotImplementedException();
         }
@@ -176,12 +176,12 @@ namespace Infrastructure.DataAccess.Repositores
             }
         }
 
-        public async Task<User> UpdateDetails(long id, User newUser,string password)
+        public async Task<User> UpdateDetails(long id, User newUser, string password)
         {
             try
             {
                 var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-                if (existingUser==null)
+                if (existingUser == null)
                 {
                     return null;
                 }
@@ -200,7 +200,7 @@ namespace Infrastructure.DataAccess.Repositores
                 existingUser.PasswordSalt = passwordSalt;
                 existingUser.Role = await context.Roles.FirstOrDefaultAsync(x => x.Id == newUser.RoleId);
 
-                var entry =  context.Users.Update(existingUser);
+                var entry = context.Users.Update(existingUser);
 
                 return entry.Entity;
             }
@@ -211,7 +211,7 @@ namespace Infrastructure.DataAccess.Repositores
             }
         }
 
-        public async Task<bool> VerifyAccount(User user,string password)
+        public async Task<bool> VerifyAccount(User user, string password)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
                 }
 
-                if(!VerifyPasswordHash(password,existingUser.PasswordHash,existingUser.PasswordSalt))
+                if (!VerifyPasswordHash(password, existingUser.PasswordHash, existingUser.PasswordSalt))
                 {
                     return false;
                 }
@@ -238,6 +238,30 @@ namespace Infrastructure.DataAccess.Repositores
             {
                 Debug.WriteLine(">>>> " + ex.Message);
                 return false; ;
+            }
+        }
+
+        public async Task<bool> AssignCountryToUser(int id, int countryId = default, string countryName = null)
+        {
+            try
+            {
+                var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+                var existingCountry = countryId != default ? await context.Countries.FirstOrDefaultAsync(x => x.Id == countryId) :
+                    await context.Countries.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(countryName.ToLower()));
+
+                if (existingUser == null || existingCountry == null)
+                {
+                    return false;
+                }
+
+                existingUser.Country = existingCountry;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(">>>> " + ex.Message);
+                return false;
             }
         }
     }

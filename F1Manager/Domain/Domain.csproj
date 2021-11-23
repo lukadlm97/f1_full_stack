@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Drivers\Driver.Aggregate.cs" />
     <Compile Remove="Roles\Role.Aggregate.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Drivers\Driver.Aggregate.cs" />
     <None Include="Roles\Role.Aggregate.cs" />
   </ItemGroup>
 

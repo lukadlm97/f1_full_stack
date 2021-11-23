@@ -48,6 +48,19 @@ namespace Infrastructure.DataAccess.Repositores
             }
         }
 
+        public async Task<Country> GetById(int id)
+        {
+            try
+            {
+                return await context.Countries.FirstOrDefaultAsync(x=>x.Id==id);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
+                return null;
+            }
+        }
+
         public async Task<bool> Insert(Country entity)
         {
             try

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -50,9 +49,7 @@ namespace WebApi.Controllers
             return Ok(users.Select(x => this.mapper.Map<SingleAcountView>(x)));
         }
 
-        
-
-        // GET: api/account/login
+        // POST: api/account/login
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto user)
@@ -87,6 +84,28 @@ namespace WebApi.Controllers
             return await Task.FromResult<ClaimsIdentity>(null);
         }
 
+        // POST: api/account/assigncountry/2
+        [AllowAnonymous]
+        [HttpPost("assigncountry/{id}")]
+        public async Task<IActionResult> AssignCountry(int id, [FromBody] AssignCountryDto countryData)
+        {
+            var isAssignedToUser = await this.userUoW.Users.AssignCountryToUser(id, countryData.CountryId, countryData.CountryName);
+            if (!isAssignedToUser)
+            {
+                return NotFound();
+            }
+
+            var countOfChanges = await this.userUoW.Commit();
+            if (countOfChanges != 0)
+            {
+                return Ok(new VerificationView
+                {
+                    Message = "success"
+                });
+            }
+            return BadRequest();
+        }
+
         // POST: api/account/register
         [AllowAnonymous]
         [HttpPost("register")]
@@ -107,14 +126,14 @@ namespace WebApi.Controllers
         [HttpPost("verify")]
         public async Task<IActionResult> Verify([FromBody] VerificationDto user)
         {
-            await this.userUoW.Users.VerifyAccount(mapper.Map<User>(user),user.Password);
+            await this.userUoW.Users.VerifyAccount(mapper.Map<User>(user), user.Password);
             var countOfChanges = await this.userUoW.Commit();
 
             if (countOfChanges != 0)
             {
                 return Ok(new VerificationView
                 {
-                    Message="success"
+                    Message = "success"
                 });
             }
             return BadRequest();

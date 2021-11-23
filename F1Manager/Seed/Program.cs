@@ -7,12 +7,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Seed.CountrySeed;
 using System;
+using System.Threading.Tasks;
 
 namespace Seed
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
@@ -36,6 +37,7 @@ namespace Seed
                     var context = services.GetRequiredService<AppDbContext>();
                     context.Database.Migrate();
                     SeedData.SeedCountriesData(context);
+                    await SeedData.SeedDriverssData(context);
                 }
                 catch (Exception ex)
                 {

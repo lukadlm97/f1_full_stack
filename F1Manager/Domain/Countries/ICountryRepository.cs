@@ -8,5 +8,6 @@ namespace Domain.Countries
 {
     public interface ICountryRepository : IRepository<Country>
     {
+        Task<Country> GetById(int id);
     }
 }
