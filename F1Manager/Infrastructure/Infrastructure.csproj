@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="UnitOfWorks\Constructors\" />
+    <Folder Include="UnitOfWorks\ConstructorRacingDetails\" />
   </ItemGroup>
 
 </Project>

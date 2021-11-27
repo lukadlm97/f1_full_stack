@@ -1,5 +1,6 @@
 using Infrastructure.DataAccess;
 using Infrastructure.UnitOfWorks.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,15 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 using WebApi.AuthorizationAssets;
 using WebApi.Extensions;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System;
 using WebApi.Utilities;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace WebApi
 {
@@ -43,7 +43,7 @@ namespace WebApi
 
             services.AddMapperConfiguration();
 
-            services.AddScoped<IUsersUoW, UsersUoW>(); 
+            services.AddScoped<IUsersUoW, UsersUoW>();
             services.AddSingleton<IJwtFactory, JwtFactory>();
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -79,7 +79,6 @@ namespace WebApi
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
             }).AddJwtBearer(configureOptions =>
             {
                 configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
@@ -91,6 +90,7 @@ namespace WebApi
             {
                 options.AddPolicy("CanViewUsers", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin));
                 options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
+                options.AddPolicy("ContentChanges", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.ContentWriter));
                 //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));
             });
 
