@@ -17,6 +17,7 @@ Timeline:
 3.	October 2021. - implemented logic for registrations users, JWT autorization, account managing etc.
 4.	end of October 2021. - created drivers and country import from Kaggle web site (discovering seed potentals)
 5.	23/11/2021 - migrate project to .NET 6, and created constructor details
+6.	27/11/2021 - created repositories for drivers and constructors, and migrate repository logic to modern approach
 
 Notes:
 ------------------------------------------------------------------------------------------------------------------------
