@@ -18,6 +18,7 @@ Timeline:
 4.	end of October 2021. - created drivers and country import from Kaggle web site (discovering seed potentals)
 5.	23/11/2021 - migrate project to .NET 6, and created constructor details
 6.	27/11/2021 - created repositories for drivers and constructors, and migrate repository logic to modern approach
+7.	01/12/2021 - made more modern approach for doing logging on repository and executing operations on repository
 
 Notes:
 ------------------------------------------------------------------------------------------------------------------------
