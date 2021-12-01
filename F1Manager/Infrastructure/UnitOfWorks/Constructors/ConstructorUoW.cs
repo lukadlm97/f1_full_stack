@@ -1,22 +1,22 @@
-﻿using Domain.Drivers;
+﻿using Domain.Constructors;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Repositores;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace Infrastructure.UnitOfWorks.Drivers
+namespace Infrastructure.UnitOfWorks.Constructors
 {
-    public class DriversUoW : IDriversUnitOfWork
+    public class ConstructorUoW : ICounstructorUnitOfWork
     {
         private readonly AppDbContext context;
 
-        public DriversUoW(AppDbContext dbContext, ILoggerFactory loggerFactory)
+        public ConstructorUoW(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            Drivers = new DriverRepository(dbContext, loggerFactory);
+            Constructors = new ConstructorRepository(dbContext,loggerFactory);
         }
 
-        public IDriverRepository Drivers { get; set; }
+        public IConstructorRepository Constructors { set; get; }
 
         public Task<int> Commit()
         {

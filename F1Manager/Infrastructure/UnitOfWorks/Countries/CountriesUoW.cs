@@ -1,6 +1,7 @@
 ﻿using Domain.Countries;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Repositores;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Infrastructure.UnitOfWorks.Countries
@@ -9,10 +10,10 @@ namespace Infrastructure.UnitOfWorks.Countries
     {
         private readonly AppDbContext context;
 
-        public CountriesUoW(AppDbContext dbContext)
+        public CountriesUoW(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            Countries = new CountryRepository(dbContext);
+            Countries = new CountryRepository(dbContext, loggerFactory);
         }
 
         public ICountryRepository Countries { get; set; }

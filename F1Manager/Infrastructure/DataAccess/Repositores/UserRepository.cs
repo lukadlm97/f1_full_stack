@@ -1,9 +1,9 @@
 ﻿using Domain.Users;
 using Domain.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,76 +13,67 @@ namespace Infrastructure.DataAccess.Repositores
     {
         private readonly AppDbContext context;
         private readonly RandomGenerator randomGenerator;
+        private readonly ILogger<UserRepository> logger;
 
-        public UserRepository(AppDbContext dbContext)
+        public UserRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
             this.randomGenerator = new RandomGenerator();
+            this.logger = loggerFactory.CreateLogger<UserRepository>();
         }
 
         public Task<bool> Delete(User entity)
         {
-            throw new NotImplementedException();
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var forDelete = await context.Users.FirstOrDefaultAsync(x => x.Id == entity.Id);
+                if (forDelete == null)
+                    return false;
+
+                context.Users.Remove(forDelete);
+
+                return true;
+            }, "Delete User");
         }
 
-        public async Task<List<User>> GetAll()
+        public Task<List<User>> GetAll()
         {
-            try
+            return ExecuteInTryCatch<List<User>>(async () =>
             {
                 return await context.Users.Where(x => !x.IsDeleted).Include(x => x.Role).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return null;
-            }
+            }, "GetAll User");
         }
 
-        public async Task<User> GetByID(long id)
+        public Task<User> GetByID(long id)
         {
-            try
+            return ExecuteInTryCatch<User>(async () =>
             {
                 return await context.Set<User>().FirstOrDefaultAsync(x => x.Id == id);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+            }, "GetByID User");
         }
 
-        public async Task<List<User>> GetObjectByName(string value)
+        public Task<List<User>> GetObjectByName(string value)
         {
-            try
+            return ExecuteInTryCatch<List<User>>(async () =>
             {
                 return await context.Set<User>()
-                        .Where(x => x.Name.Contains(value) || x.Surname.Contains(value))
-                        .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+                         .Where(x => x.Name.Contains(value) || x.Surname.Contains(value))
+                         .ToListAsync();
+            }, "GetObjectByName User");
         }
 
-        public async Task<User> GetObjectByUsername(string username)
+        public Task<User> GetObjectByUsername(string username)
         {
-            try
+            return ExecuteInTryCatch<User>(async () =>
             {
                 return await context.Set<User>()
                         .FirstOrDefaultAsync(x => x.UserName.Contains(username));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+            }, "GetObjectByName User");
         }
 
-        public async Task<User> Login(string username, string password)
+        public Task<User> Login(string username, string password)
         {
-            try
+            return ExecuteInTryCatch<User>(async () =>
             {
                 var user = await context.Set<User>().Include(x => x.Role).FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted);
                 if (user == null)
@@ -90,17 +81,12 @@ namespace Infrastructure.DataAccess.Repositores
                 if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                     return null;
                 return user;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+            }, "Login User");
         }
 
-        public async Task<User> Register(User newUser, string password)
+        public Task<User> Register(User newUser, string password)
         {
-            try
+            return ExecuteInTryCatch<User>(async () =>
             {
                 if (await UserExists(newUser.UserName))
                 {
@@ -119,12 +105,7 @@ namespace Infrastructure.DataAccess.Repositores
                 var entry = await context.Users.AddAsync(newUser);
 
                 return entry.Entity;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+            }, "Register User");
         }
 
         public Task<bool> Insert(User entity)
@@ -137,19 +118,14 @@ namespace Infrastructure.DataAccess.Repositores
             throw new NotImplementedException();
         }
 
-        public async Task<bool> UserExists(string username)
+        public Task<bool> UserExists(string username)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 if (await context.Set<User>().AnyAsync(x => x.UserName == username && !x.IsDeleted))
                     return true;
                 return false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return false;
-            }
+            }, "UserExists User");
         }
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
@@ -176,9 +152,9 @@ namespace Infrastructure.DataAccess.Repositores
             }
         }
 
-        public async Task<User> UpdateDetails(long id, User newUser, string password)
+        public Task<User> UpdateDetails(long id, User newUser, string password)
         {
-            try
+            return ExecuteInTryCatch<User>(async () =>
             {
                 var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
                 if (existingUser == null)
@@ -203,17 +179,12 @@ namespace Infrastructure.DataAccess.Repositores
                 var entry = context.Users.Update(existingUser);
 
                 return entry.Entity;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return null;
-            }
+            }, "Register User");
         }
 
-        public async Task<bool> VerifyAccount(User user, string password)
+        public Task<bool> VerifyAccount(User user, string password)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == user.Id);
                 if (existingUser == null)
@@ -233,17 +204,12 @@ namespace Infrastructure.DataAccess.Repositores
                 context.Users.Update(existingUser);
 
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return false; ;
-            }
+            }, "UserExists User");
         }
 
-        public async Task<bool> AssignCountryToUser(int id, int countryId = default, string countryName = null)
+        public Task<bool> AssignCountryToUser(int id, int countryId = default, string countryName = null)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
                 var existingCountry = countryId != default ? await context.Countries.FirstOrDefaultAsync(x => x.Id == countryId) :
@@ -257,11 +223,19 @@ namespace Infrastructure.DataAccess.Repositores
                 existingUser.Country = existingCountry;
 
                 return true;
-            }
-            catch (Exception ex)
+            }, "UserExists User");
+        }
+
+        private Task<T> ExecuteInTryCatch<T>(Func<Task<T>> databaseFunction, string errorMessage)
+        {
+            try
             {
-                Debug.WriteLine(">>>> " + ex.Message);
-                return false;
+                return databaseFunction();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, errorMessage);
+                throw;
             }
         }
     }

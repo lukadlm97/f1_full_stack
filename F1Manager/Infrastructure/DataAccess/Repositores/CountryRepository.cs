@@ -1,8 +1,8 @@
 ﻿using Domain.Countries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Repositores
@@ -10,15 +10,17 @@ namespace Infrastructure.DataAccess.Repositores
     public class CountryRepository : ICountryRepository
     {
         private readonly AppDbContext context;
+        private readonly ILogger<CountryRepository> logger;
 
-        public CountryRepository(AppDbContext dbContext)
+        public CountryRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
+            this.logger = loggerFactory.CreateLogger<CountryRepository>();
         }
 
-        public async Task<bool> Delete(Country entity)
+        public Task<bool> Delete(Country entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var forDelete = await context.Countries.FirstOrDefaultAsync(x => x.Id == entity.Id);
                 if (forDelete == null)
@@ -27,57 +29,37 @@ namespace Infrastructure.DataAccess.Repositores
                 context.Countries.Remove(forDelete);
 
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
-            }
+            }, "Delete Country");
         }
 
-        public async Task<List<Country>> GetAll()
+        public Task<List<Country>> GetAll()
         {
-            try
+            return ExecuteInTryCatch<List<Country>>(async () =>
             {
                 return await context.Countries.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return null;
-            }
+            }, "GetAll Country");
         }
 
-        public async Task<Country> GetById(int id)
+        public Task<Country> GetById(int id)
         {
-            try
+            return ExecuteInTryCatch<Country>(async () =>
             {
-                return await context.Countries.FirstOrDefaultAsync(x=>x.Id==id);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return null;
-            }
+                return await context.Countries.FirstOrDefaultAsync(x => x.Id == id);
+            }, "GetById Country");
         }
 
-        public async Task<bool> Insert(Country entity)
+        public Task<bool> Insert(Country entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 await context.Countries.AddAsync(entity);
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
-            }
+            }, "Insert Country");
         }
 
-        public async Task<bool> Update(Country entity)
+        public Task<bool> Update(Country entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var existingCountry = await this.context.Countries.FirstOrDefaultAsync(x => x.Id == entity.Id);
 
@@ -94,11 +76,19 @@ namespace Infrastructure.DataAccess.Repositores
 
                 context.Countries.Update(existingCountry);
                 return true;
-            }
-            catch (Exception ex)
+            }, "Update Country");
+        }
+
+        private Task<T> ExecuteInTryCatch<T>(Func<Task<T>> databaseFunction, string errorMessage)
+        {
+            try
             {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
+                return databaseFunction();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, errorMessage);
+                throw;
             }
         }
     }

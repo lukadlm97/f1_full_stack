@@ -1,6 +1,7 @@
 ﻿using Domain.Users;
 using Infrastructure.DataAccess;
 using Infrastructure.DataAccess.Repositores;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Infrastructure.UnitOfWorks.Users
@@ -9,10 +10,10 @@ namespace Infrastructure.UnitOfWorks.Users
     {
         private readonly AppDbContext context;
 
-        public UsersUoW(AppDbContext dbContext)
+        public UsersUoW(AppDbContext dbContext,IUserRepository userRepository,ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            Users = new UserRepository(dbContext);
+            Users = new UserRepository(dbContext, loggerFactory);
         }
 
         public IUserRepository Users { get; set; }

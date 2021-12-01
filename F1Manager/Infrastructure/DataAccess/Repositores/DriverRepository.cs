@@ -1,10 +1,9 @@
 ﻿using Domain.Drivers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Repositores
@@ -12,15 +11,17 @@ namespace Infrastructure.DataAccess.Repositores
     public class DriverRepository : IDriverRepository
     {
         private readonly AppDbContext context;
+        private readonly ILogger<DriverRepository> logger;
 
-        public DriverRepository(AppDbContext dbContext)
+        public DriverRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
+            this.logger = loggerFactory.CreateLogger<DriverRepository>();
         }
 
-        public async Task<bool> Delete(Driver entity)
+        public Task<bool> Delete(Driver entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var forDelete = await context.Drivers.FirstOrDefaultAsync(x => x.Id == entity.Id);
                 if (forDelete == null)
@@ -29,64 +30,42 @@ namespace Infrastructure.DataAccess.Repositores
                 context.Drivers.Remove(forDelete);
 
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
-            }
+            }, "Delete Driver");
         }
 
-        public async Task<List<Driver>> GetAll()
+        public Task<List<Driver>> GetAll()
         {
-            try
+            return ExecuteInTryCatch<List<Driver>>(async () =>
             {
-                return await context.Drivers.Include(x=>x.Country).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return null;
-            }
+                return await context.Drivers.Include(x => x.Country).ToListAsync();
+            }, "GetAll Drivers");
         }
 
-        public async Task<Driver> GetById(int id)
+        public Task<Driver> GetById(int id)
         {
-
-            try
+            return ExecuteInTryCatch<Driver>(async () =>
             {
                 return await context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return null;
-            }
+            }, "GetById Driver");
         }
 
-        public async Task<IEnumerable<Driver>> GetByNationality(string countryName = null, int countryId = 0)
+        public Task<IEnumerable<Driver>> GetByNationality(string countryName = null, int countryId = 0)
         {
-            try
+            return ExecuteInTryCatch<IEnumerable<Driver>>(async () =>
             {
                 var existingCountry = countryId != default ? await context.Countries.FirstOrDefaultAsync(x => x.Id == countryId) :
-                      await context.Countries.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(countryName.ToLower()));
+                        await context.Countries.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(countryName.ToLower()));
 
                 if (existingCountry == null)
                     return null;
 
-
-               return context.Drivers.Where(x=>x.Country.Id==existingCountry.Id).AsEnumerable();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return new List<Driver>();
-            }
+                return context.Drivers.Where(x => x.Country.Id == existingCountry.Id).AsEnumerable();
+            }, "GetByNationality Driver");
         }
 
-        public async Task<bool> Insert(Driver entity)
+        public Task<bool> Insert(Driver entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == entity.CountryId);
 
@@ -97,17 +76,12 @@ namespace Infrastructure.DataAccess.Repositores
                 await context.Drivers.AddAsync(entity);
 
                 return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
-            }
+            }, "Insert Driver");
         }
 
-        public async Task<bool> Update(Driver entity)
+        public Task<bool> Update(Driver entity)
         {
-            try
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 var existingDriver = await this.context.Drivers.FirstOrDefaultAsync(x => x.Id == entity.Id);
                 var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == entity.CountryId);
@@ -125,11 +99,19 @@ namespace Infrastructure.DataAccess.Repositores
 
                 context.Drivers.Update(existingDriver);
                 return true;
-            }
-            catch (Exception ex)
+            }, "Update Driver");
+        }
+
+        private Task<T> ExecuteInTryCatch<T>(Func<Task<T>> databaseFunction, string errorMessage)
+        {
+            try
             {
-                Debug.WriteLine(">>>>>>>>>>>> " + ex.Message);
-                return false;
+                return databaseFunction();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, errorMessage);
+                throw;
             }
         }
     }

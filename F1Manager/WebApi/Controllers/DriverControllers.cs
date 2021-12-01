@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Infrastructure.UnitOfWorks.Users;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {

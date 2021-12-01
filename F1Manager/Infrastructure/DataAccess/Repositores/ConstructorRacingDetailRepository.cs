@@ -12,10 +12,10 @@ namespace Infrastructure.DataAccess.Repositores
         private readonly AppDbContext appContext;
         private readonly ILogger<ConstructorRacingDetailRepository> logger;
 
-        public ConstructorRacingDetailRepository(AppDbContext appContext, ILogger<ConstructorRacingDetailRepository> logger)
+        public ConstructorRacingDetailRepository(AppDbContext appContext, ILoggerFactory loggerFactory)
         {
             this.appContext = appContext;
-            this.logger = logger;
+            this.logger = loggerFactory.CreateLogger<ConstructorRacingDetailRepository>();
         }
 
         public Task<bool> Delete(ConstructorsRacingDetail entity)
