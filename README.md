@@ -19,6 +19,7 @@ Timeline:
 5.	23/11/2021 - migrate project to .NET 6, and created constructor details
 6.	27/11/2021 - created repositories for drivers and constructors, and migrate repository logic to modern approach
 7.	01/12/2021 - made more modern approach for doing logging on repository and executing operations on repository
+8.	13/12/2021 - downgrade project to .net 5 (problems with entity and logging providers), added serilog for tracing, done get_all drivers functionality
 
 Notes:
 ------------------------------------------------------------------------------------------------------------------------
