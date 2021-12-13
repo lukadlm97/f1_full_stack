@@ -13,7 +13,7 @@ namespace Infrastructure.UnitOfWorks.Users
         public UsersUoW(AppDbContext dbContext,IUserRepository userRepository,ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            Users = new UserRepository(dbContext, loggerFactory);
+            Users = userRepository;
         }
 
         public IUserRepository Users { get; set; }

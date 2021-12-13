@@ -1,5 +1,4 @@
 using Infrastructure.DataAccess;
-using Infrastructure.UnitOfWorks.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System;
 using System.Text;
 using WebApi.AuthorizationAssets;
@@ -43,7 +43,18 @@ namespace WebApi
 
             services.AddMapperConfiguration();
 
-            services.AddScoped<IUsersUoW, UsersUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.Users.IUsersUoW, Infrastructure.UnitOfWorks.Users.UsersUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork, Infrastructure.UnitOfWorks.Drivers.DriversUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.ConstructorRacingDetails.IConstructorRacingDetailsUnitOfWork, Infrastructure.UnitOfWorks.ConstructorRacingDetails.ConstructorRacingDetailsUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.Countries.ICountriesUnitOfWork, Infrastructure.UnitOfWorks.Countries.CountriesUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.Constructors.ICounstructorUnitOfWork, Infrastructure.UnitOfWorks.Constructors.ConstructorUoW>();
+
+            services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
+            services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
+            services.AddScoped<Domain.ConstructorRacingDetails.IConstructorRacingDetail, Infrastructure.DataAccess.Repositores.ConstructorRacingDetailRepository>();
+            services.AddScoped<Domain.Countries.ICountryRepository, Infrastructure.DataAccess.Repositores.CountryRepository>();
+            services.AddScoped<Domain.Drivers.IDriverRepository, Infrastructure.DataAccess.Repositores.DriverRepository>();
+
             services.AddSingleton<IJwtFactory, JwtFactory>();
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -103,6 +114,7 @@ namespace WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSerilogRequestLogging();
             }
 
             app.UseCors(x => x

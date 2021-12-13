@@ -1,5 +1,4 @@
-﻿using Domain.Interfaces;
-using Infrastructure.DataAccess;
+﻿using Infrastructure.DataAccess;
 using Infrastructure.UnitOfWorks.Countries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,14 +10,13 @@ using System.Threading.Tasks;
 
 namespace Seed
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-
                     services.AddLogging(configure => configure.AddConsole())
                    .AddScoped<CountriesUoW, CountriesUoW>()
                    .AddDbContext<AppDbContext>(options =>
@@ -36,8 +34,9 @@ namespace Seed
                 {
                     var context = services.GetRequiredService<AppDbContext>();
                     context.Database.Migrate();
-                    SeedData.SeedCountriesData(context);
-                    await SeedData.SeedDriverssData(context);
+                    SeedData.SetActiveDrivers(context);
+                    //SeedData.SeedCountriesData(context);
+                    //await SeedData.SeedDriverssData(context);
                 }
                 catch (Exception ex)
                 {
@@ -46,7 +45,6 @@ namespace Seed
                 }
             }
             host.Run();
-
         }
     }
 }

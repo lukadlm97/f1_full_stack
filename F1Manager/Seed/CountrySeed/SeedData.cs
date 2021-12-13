@@ -27,6 +27,25 @@ namespace Seed.CountrySeed
             }
         }
 
+        public static void SetActiveDrivers(AppDbContext context)
+        {
+            if (context.Drivers.Any())
+            {
+                var drivers
+                    = context.Drivers;
+
+                foreach (var driver in  drivers)
+                {
+                    if (driver.Number != null)
+                    {
+                        driver.IsActive = true;
+                    }
+                }
+
+                context.SaveChanges();
+            }
+        }
+
         public static async Task SeedDriverssData(AppDbContext context)
         {
             var drivers = GetDriverData();

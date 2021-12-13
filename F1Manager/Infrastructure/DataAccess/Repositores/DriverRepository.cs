@@ -37,7 +37,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<List<Driver>>(async () =>
             {
-                return await context.Drivers.Include(x => x.Country).ToListAsync();
+                return await context.Drivers.Where(x=>x.IsActive).Include(x => x.Country).ToListAsync();
             }, "GetAll Drivers");
         }
 

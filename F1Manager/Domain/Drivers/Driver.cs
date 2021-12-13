@@ -19,6 +19,7 @@ namespace Domain.Drivers
         public DateTime DateOfBirth { get; set; }
         public string WikiUrl { get; set; }
         public int CountryId { get; set; }
+        public bool IsActive { get; set; }
 
         [ForeignKey(nameof(CountryId))]
         public virtual Country Country { get; set; }
