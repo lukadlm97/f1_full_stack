@@ -4,14 +4,16 @@ using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211215204450_Added_New_Properties_For_Drivers")]
+    partial class Added_New_Properties_For_Drivers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,60 +112,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Constructors");
                 });
 
-            modelBuilder.Entity("Domain.Contracts.Contract", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ConstructorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DriverId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DriverRolesId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EndOfContactDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("EstaminateValue")
-                        .HasColumnType("float");
-
-                    b.Property<int>("EstaminateYears")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("StartOfContactDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConstructorId");
-
-                    b.HasIndex("DriverId");
-
-                    b.HasIndex("DriverRolesId");
-
-                    b.ToTable("Contract");
-                });
-
             modelBuilder.Entity("Domain.Countries.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -195,24 +143,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("Domain.DriverRoles.DriverRoles", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsValid")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RoleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DriverRoles");
                 });
 
             modelBuilder.Entity("Domain.Drivers.Driver", b =>
@@ -361,27 +291,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Countries.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Contracts.Contract", b =>
-                {
-                    b.HasOne("Domain.Constructors.Constructor", "Constructor")
-                        .WithMany("Contracts")
-                        .HasForeignKey("ConstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Drivers.Driver", "Driver")
-                        .WithMany("Contracts")
-                        .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.DriverRoles.DriverRoles", "DriverRoles")
-                        .WithMany()
-                        .HasForeignKey("DriverRolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

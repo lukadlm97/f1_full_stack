@@ -1,5 +1,6 @@
 ﻿using Domain.Base;
 using Domain.Countries;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Constructors
@@ -20,5 +21,8 @@ namespace Domain.Constructors
 
         [ForeignKey(nameof(CountryId))]
         public virtual Country Country { get; set; }
+
+
+        public ICollection<Contracts.Contract> Contracts { get; set; }
     }
 }

@@ -34,7 +34,8 @@ namespace Seed
                 {
                     var context = services.GetRequiredService<AppDbContext>();
                     context.Database.Migrate();
-                    SeedData.SetActiveDrivers(context);
+                    SeedData.SetRetairDrivers(context);
+                    //SeedData.SetActiveDrivers(context);
                     //SeedData.SeedCountriesData(context);
                     //await SeedData.SeedDriverssData(context);
                 }

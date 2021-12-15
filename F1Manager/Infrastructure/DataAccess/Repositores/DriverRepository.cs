@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Repositores
@@ -37,7 +38,15 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<List<Driver>>(async () =>
             {
-                return await context.Drivers.Where(x=>x.IsActive).Include(x => x.Country).ToListAsync();
+                return await context.Drivers.Where(x => x.IsActive).ToListAsync();
+            }, "GetAll Drivers");
+        }
+
+        public Task<IEnumerable<Driver>> GetAllRaw(CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<IEnumerable<Driver>>(async () =>
+            {
+                return context.Drivers.Where(x => x.IsActive).Include(x => x.Country).AsEnumerable<Driver>();
             }, "GetAll Drivers");
         }
 
@@ -79,6 +88,22 @@ namespace Infrastructure.DataAccess.Repositores
             }, "Insert Driver");
         }
 
+        public Task<bool> DriverRetirement(int id, CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingDriver = await this.context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (existingDriver == null)
+                    return false;
+
+                existingDriver.IsRetired = true;
+                context.Drivers.Update(existingDriver);
+
+                return true;
+            }, "GetAll Drivers");
+        }
+
         public Task<bool> Update(Driver entity)
         {
             return ExecuteInTryCatch<bool>(async () =>
@@ -100,6 +125,39 @@ namespace Infrastructure.DataAccess.Repositores
                 context.Drivers.Update(existingDriver);
                 return true;
             }, "Update Driver");
+        }
+
+        public Task<bool> DriverReactivation(int id, CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingDriver = await this.context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (existingDriver == null)
+                    return false;
+
+                existingDriver.IsRetired = false;
+                context.Drivers.Update(existingDriver);
+
+                return true;
+            }, "GetAll Drivers");
+        }
+
+        public Task<bool> ChangeCitizenship(int id, int countryId, CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingDriver = await this.context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
+                var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == countryId);
+
+                if (existingDriver == null || country == null)
+                    return false;
+
+                existingDriver.Country = country;
+
+                context.Drivers.Update(existingDriver);
+                return true;
+            }, "ChangeCitizenship Driver");
         }
 
         private Task<T> ExecuteInTryCatch<T>(Func<Task<T>> databaseFunction, string errorMessage)
