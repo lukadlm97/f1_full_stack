@@ -21,6 +21,7 @@ Timeline:
 7.	01/12/2021 - made more modern approach for doing logging on repository and executing operations on repository
 8.	13/12/2021 - downgrade project to .net 5 (problems with entity and logging providers), added serilog for tracing, done get_all drivers functionality
 9.	15/12/2021 - completed driver controller with all needed functionalities. started with doman part of contracts.
+10.	19/12/2021 - finished constructor endpoints, created Swagger documentations for API, successfully ended testing of this endpoints.
 
 Notes:
 ------------------------------------------------------------------------------------------------------------------------
