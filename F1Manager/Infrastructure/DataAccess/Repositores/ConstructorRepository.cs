@@ -19,6 +19,24 @@ namespace Infrastructure.DataAccess.Repositores
             this.logger = loggerFactory.CreateLogger<ConstructorRepository>();
         }
 
+        public Task<bool> ChangeTeamNationality(int constructorId, int teamNationalityId)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingConstructor = await this.context.Constructors.FirstOrDefaultAsync(x => x.Id == constructorId);
+                var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == teamNationalityId);
+
+                if (existingConstructor == null || country == null)
+                    return false;
+
+                existingConstructor.Country = country;
+                existingConstructor.UpdatedDate= DateTime.UtcNow;
+
+                context.Constructors.Update(existingConstructor);
+                return true;
+            }, "Update Constructors");
+        }
+
         public Task<bool> Delete(Constructor entity)
         {
             return ExecuteInTryCatch<bool>(async () =>
@@ -26,6 +44,7 @@ namespace Infrastructure.DataAccess.Repositores
                 var forDelete = await context.Constructors.FirstOrDefaultAsync(x => x.Id == entity.Id);
                 if (forDelete == null)
                     return false;
+
 
                 context.Constructors.Remove(forDelete);
 
@@ -59,10 +78,45 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
 
                 entity.Country = country;
+                entity.CreatedDate = DateTime.UtcNow;
                 await context.Constructors.AddAsync(entity);
 
                 return true;
             }, "Insert Constructors");
+        }
+
+        public Task<bool> MakeComeback(int constructorId)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingConstructor = await this.context.Constructors.FirstOrDefaultAsync(x => x.Id == constructorId);
+
+                if (existingConstructor == null)
+                    return false;
+
+                existingConstructor.UpdatedDate = DateTime.UtcNow;
+                existingConstructor.IsActive = true;
+
+                context.Constructors.Update(existingConstructor);
+                return true;
+            }, "Update Constructors");
+        }
+
+        public Task<bool> RetireConstructor(int constructorId)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingConstructor = await this.context.Constructors.FirstOrDefaultAsync(x => x.Id == constructorId);
+
+                if (existingConstructor == null)
+                    return false;
+
+                existingConstructor.UpdatedDate = DateTime.UtcNow;
+                existingConstructor.IsActive = false;
+
+                context.Constructors.Update(existingConstructor);
+                return true;
+            }, "Update Constructors");
         }
 
         public Task<bool> Update(Constructor entity)
@@ -75,6 +129,7 @@ namespace Infrastructure.DataAccess.Repositores
                 if (existingConstructor == null || country == null)
                     return false;
 
+                existingConstructor.UpdatedDate = DateTime.UtcNow;
                 existingConstructor.Base = entity.Base;
                 existingConstructor.FullName = entity.FullName;
                 existingConstructor.ShortName = entity.ShortName;

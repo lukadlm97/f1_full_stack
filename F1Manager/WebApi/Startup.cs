@@ -1,9 +1,11 @@
+using AutoMapper;
 using Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +61,19 @@ namespace WebApi
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
+
+            // Auto Mapper Configurations
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new Mappers.ConstructorProfile());
+                mc.AddProfile(new Mappers.DriverProfile());
+                mc.AddProfile(new Mappers.UserProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
+
             SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]));
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
 
@@ -106,6 +121,23 @@ namespace WebApi
             });
 
             services.AddSingleton<IAuthorizationHandler, RoleHandler>();
+
+            services.AddApiVersioning(setup =>
+            {
+                setup.DefaultApiVersion = new ApiVersion(1, 0);
+                setup.AssumeDefaultVersionWhenUnspecified = true;
+                setup.ReportApiVersions = true;
+            });
+
+            services.AddVersionedApiExplorer(setup =>
+            {
+                setup.GroupNameFormat = "'v'VVV";
+                setup.SubstituteApiVersionInUrl = true;
+            });
+
+            services.AddSwaggerGen(c =>
+            {
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -113,6 +145,10 @@ namespace WebApi
         {
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SuperfundInvest v1"));
+
+
                 app.UseDeveloperExceptionPage();
                 app.UseSerilogRequestLogging();
             }

@@ -121,6 +121,8 @@ namespace Infrastructure.DataAccess.Repositores
                 existingDriver.Code = entity.Code;
                 existingDriver.Forename = entity.Forename;
                 existingDriver.Surname = entity.Surname;
+                existingDriver.IsActive = entity.IsActive;
+                existingDriver.IsRetired = entity.IsRetired;
 
                 context.Drivers.Update(existingDriver);
                 return true;

@@ -16,6 +16,7 @@ namespace Domain.Constructors
         public string Website { get; set; }
         public string FirstEntry { get; set; }
         public string LastEntry { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public int CountryId { get; set; }
 

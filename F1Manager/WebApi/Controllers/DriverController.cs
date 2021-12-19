@@ -5,20 +5,24 @@ using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Route("api/drivers")]
     [ApiController]
-    public class DriverControllers : ControllerBase
+
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    public class DriverController : ControllerBase
     {
         private readonly Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork;
         private readonly IMapper mapper;
 
-        public DriverControllers(Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork, IMapper mapper)
+        public DriverController(Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork, IMapper mapper)
         {
             this.driversUnitOfWork = driversUnitOfWork;
             this.mapper = mapper;
         }
 
         // GET: api/drivers/
+
+        [MapToApiVersion("1.0")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllDrivers()
         {
@@ -43,6 +47,8 @@ namespace WebApi.Controllers
         }
 
         //POST: api/drivers/create
+
+        [MapToApiVersion("1.0")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateDriver([FromBody] Domain.Drivers.Driver driver, CancellationToken cancellationToken = default)
         {
@@ -58,6 +64,8 @@ namespace WebApi.Controllers
         }
 
         //PUT: api/drivers/{id}/update
+
+        [MapToApiVersion("1.0")]
         [HttpPost("{id}/update")]
         public async Task<IActionResult> UpdateDriver(int id, [FromBody] Domain.Drivers.Driver driver, CancellationToken cancellationToken = default)
         {
@@ -76,6 +84,8 @@ namespace WebApi.Controllers
         }
 
         //PUT: api/drivers/{id}/update
+
+        [MapToApiVersion("1.0")]
         [HttpDelete("{id}/delete")]
         public async Task<IActionResult> DeleteDriver(int id, CancellationToken cancellationToken = default)
         {
@@ -90,6 +100,8 @@ namespace WebApi.Controllers
             return Ok();
         }
 
+
+        [MapToApiVersion("1.0")]
         [HttpGet("{id}/retirement")]
         public async Task<IActionResult> DriverRetirement(int id, CancellationToken cancellationToken = default)
         {
@@ -104,6 +116,8 @@ namespace WebApi.Controllers
             return Ok();
         }
 
+
+        [MapToApiVersion("1.0")]
         [HttpGet("{id}/comeback")]
         public async Task<IActionResult> DriverComeback(int id, CancellationToken cancellationToken = default)
         {
@@ -118,6 +132,8 @@ namespace WebApi.Controllers
             return Ok();
         }
 
+
+        [MapToApiVersion("1.0")]
         [HttpGet("{id}/citizenship/{countryId}")]
         public async Task<IActionResult> ChangeCitizenship(int id, int countryId, CancellationToken cancellationToken = default)
         {
