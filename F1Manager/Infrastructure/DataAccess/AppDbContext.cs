@@ -17,9 +17,11 @@ namespace Infrastructure.DataAccess
         public DbSet<Country> Countries { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Constructor> Constructors { get; set; }
-        public DbSet<ConstructorsRacingDetail> ConstructorsRacingDetails { get; set; }
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<DriverRoles> DriverRoles { get; set; }
+        public DbSet<ConstructorsRacingDetail> ConstructorsRacingDetails { get; set; }
+        public DbSet<Domain.RacingChampionship.RacingChampionship> RacingChampionships { get; set; }
+        public DbSet<Domain.DriversRacingDetails.DriversRacingDetails> DriversRacingDetails { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -34,10 +36,14 @@ namespace Infrastructure.DataAccess
         {
             modelBuilder.Entity<User>().HasOne(x => x.Country);
             modelBuilder.Entity<Driver>().HasOne(x => x.Country);
-            modelBuilder.Entity<Driver>().HasMany<Contract>(x=>x.Contracts);
+            modelBuilder.Entity<Driver>().HasMany<Contract>(x => x.Contracts);
             modelBuilder.Entity<Constructor>().HasOne(x => x.Country);
             modelBuilder.Entity<Constructor>().HasMany<Contract>(x => x.Contracts);
             modelBuilder.Entity<ConstructorsRacingDetail>().HasOne(x => x.Constructor);
+            modelBuilder.Entity<ConstructorsRacingDetail>().HasOne(x => x.RacingChampionship);
+            modelBuilder.Entity<Domain.DriversRacingDetails.DriversRacingDetails>().HasOne(x => x.Driver);
+            modelBuilder.Entity<Domain.DriversRacingDetails.DriversRacingDetails>().HasOne(x => x.RacingChampionship);
+
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using Domain.Base;
-using Domain.Constructors;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Domain.ConstructorRacingDetails
+namespace Domain.DriversRacingDetails
 {
-    [Table("ConstructorsRacingDetails")]
-    public class ConstructorsRacingDetail : EntityBase<int>
+    public class DriversRacingDetails : EntityBase<int>
     {
         public int ConstructorChampionships { get; set; }
         public int DriverChampionships { get; set; }
@@ -13,13 +11,13 @@ namespace Domain.ConstructorRacingDetails
         public int Podiums { get; set; }
         public int PolPositions { get; set; }
         public int FastesLaps { get; set; }
-        public int ConstructorId { get; set; }
         public int CompetitionId { get; set; }
-
-        [ForeignKey(nameof(ConstructorId))]
-        public virtual Constructor Constructor { get; set; }
+        public int DriverId { get; set; }
 
         [ForeignKey(nameof(CompetitionId))]
         public virtual RacingChampionship.RacingChampionship RacingChampionship { get; set; }
+
+        [ForeignKey(nameof(DriverId))]
+        public virtual Drivers.Driver Driver { get; set; }
     }
 }

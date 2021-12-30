@@ -26,7 +26,7 @@ namespace WebApi.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllDrivers()
         {
-            var drivers = await this.driversUnitOfWork.Drivers.GetAllRaw();
+            var drivers = await this.driversUnitOfWork.Drivers.GetAll();
 
             if (drivers == null)
                 return NotFound("No registered drivers.");
@@ -38,7 +38,7 @@ namespace WebApi.Controllers
         [HttpGet("full")]
         public async Task<IActionResult> GetFullDrivers()
         {
-            var drivers = await this.driversUnitOfWork.Drivers.GetAll();
+            var drivers = await this.driversUnitOfWork.Drivers.GetAllRaw();
 
             if (drivers == null)
                 return NotFound("No registered drivers.");

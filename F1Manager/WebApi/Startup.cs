@@ -68,6 +68,7 @@ namespace WebApi
                 mc.AddProfile(new Mappers.ConstructorProfile());
                 mc.AddProfile(new Mappers.DriverProfile());
                 mc.AddProfile(new Mappers.UserProfile());
+                mc.AddProfile(new Mappers.ConstructorResultProfile());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();

@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
-                var forDelete = await this.appContext.ConstructorsRacingDetails.FirstOrDefaultAsync(x => x.Id == entity.Id);
+                var forDelete = await this.appContext.ConstructorsRacingDetails.FirstOrDefaultAsync(x => x.ConstructorId == entity.ConstructorId);
                 if (forDelete == null)
                     return false;
 
@@ -203,7 +203,7 @@ namespace Infrastructure.DataAccess.Repositores
             return ExecuteInTryCatch<bool>(async () =>
             {
                 var existingConstructorRacingDetails = await this.appContext.ConstructorsRacingDetails
-                                                                        .FirstOrDefaultAsync(x => x.Id == entity.Id);
+                                                                        .FirstOrDefaultAsync(x => x.ConstructorId == entity.ConstructorId);
                 var originalConstructor = await appContext.Constructors.FirstOrDefaultAsync(x => x.Id == entity.ConstructorId);
 
                 if (existingConstructorRacingDetails == null || originalConstructor == null)

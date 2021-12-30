@@ -26,6 +26,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("CompetitionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ConstructorChampionships")
                         .HasColumnType("int");
 
@@ -48,6 +51,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
 
                     b.HasIndex("ConstructorId");
 
@@ -268,6 +273,76 @@ namespace Infrastructure.Migrations
                     b.ToTable("Drivers");
                 });
 
+            modelBuilder.Entity("Domain.DriversRacingDetails.DriversRacingDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CompetitionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ConstructorChampionships")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DriverChampionships")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DriverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FastesLaps")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Podiums")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PolPositions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RaceVictories")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetitionId");
+
+                    b.HasIndex("DriverId");
+
+                    b.ToTable("DriversRacingDetails");
+                });
+
+            modelBuilder.Entity("Domain.RacingChampionship.RacingChampionship", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ChampionshipNameFull")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChampionshipNameShort")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FirstEntry")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LastEntry")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrganisedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalCompetitions")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RacingChampionships");
+                });
+
             modelBuilder.Entity("Domain.Roles.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -352,6 +427,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.ConstructorRacingDetails.ConstructorsRacingDetail", b =>
                 {
+                    b.HasOne("Domain.RacingChampionship.RacingChampionship", "RacingChampionship")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Constructors.Constructor", "Constructor")
                         .WithMany()
                         .HasForeignKey("ConstructorId")
@@ -394,6 +475,21 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Countries.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.DriversRacingDetails.DriversRacingDetails", b =>
+                {
+                    b.HasOne("Domain.RacingChampionship.RacingChampionship", "RacingChampionship")
+                        .WithMany()
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Drivers.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
