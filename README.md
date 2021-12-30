@@ -22,6 +22,8 @@ Timeline:
 8.	13/12/2021 - downgrade project to .net 5 (problems with entity and logging providers), added serilog for tracing, done get_all drivers functionality
 9.	15/12/2021 - completed driver controller with all needed functionalities. started with doman part of contracts.
 10.	19/12/2021 - finished constructor endpoints, created Swagger documentations for API, successfully ended testing of this endpoints.
+11.	end of December 2021. - finished buissnes logic for racing result for drivers, constructors and contracts.
+
 
 Notes:
 ------------------------------------------------------------------------------------------------------------------------
