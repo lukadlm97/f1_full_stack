@@ -23,6 +23,7 @@ Timeline:
 9.	15/12/2021 - completed driver controller with all needed functionalities. started with doman part of contracts.
 10.	19/12/2021 - finished constructor endpoints, created Swagger documentations for API, successfully ended testing of this endpoints.
 11.	end of December 2021. - finished buissnes logic for racing result for drivers, constructors and contracts.
+12.	16/01/2022 - tiny improvments on insert new driver logic (return created driver etc. for esier handling this action on front)
 
 
 Notes:
