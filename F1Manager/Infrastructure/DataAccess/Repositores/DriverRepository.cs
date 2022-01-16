@@ -189,5 +189,22 @@ namespace Infrastructure.DataAccess.Repositores
                 return existingDriver;
             }, "GetLatestCreated Driver");
         }
+
+        public Task<bool> DriverDeactivation(int id, CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var existingDriver = await this.context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (existingDriver == null)
+                    return false;
+
+
+                existingDriver.IsActive = false;
+
+                context.Drivers.Update(existingDriver);
+                return true;
+            }, "GetLatestCreated Driver");
+        }
     }
 }

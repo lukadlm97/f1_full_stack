@@ -135,6 +135,21 @@ namespace WebApi.Controllers
             return Ok();
         }
 
+        [MapToApiVersion("1.0")]
+        [HttpGet("{id}/deactivate")]
+        public async Task<IActionResult> DeriverDeactivation(int id, CancellationToken cancellationToken = default)
+        {
+            if (!await this.driversUnitOfWork.Drivers.DriverDeactivation(id))
+                return BadRequest("Driver not deactivated!!!");
+
+            if (await this.driversUnitOfWork.Commit() == 0)
+            {
+                return BadRequest("Driver deactivated not confirmed!!!");
+            }
+
+            return Ok();
+        }
+
 
         [MapToApiVersion("1.0")]
         [HttpGet("{id}/citizenship/{countryId}")]
