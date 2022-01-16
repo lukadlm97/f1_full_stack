@@ -82,7 +82,7 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
 
                 entity.Country = country;
-                await context.Drivers.AddAsync(entity);
+                var item = await context.Drivers.AddAsync(entity);
 
                 return true;
             }, "Insert Driver");
@@ -139,6 +139,7 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
 
                 existingDriver.IsRetired = false;
+                existingDriver.IsActive = true;
                 context.Drivers.Update(existingDriver);
 
                 return true;
@@ -173,6 +174,20 @@ namespace Infrastructure.DataAccess.Repositores
                 logger.LogError(e, errorMessage);
                 throw;
             }
+        }
+
+        public Task<Driver> GetLatestCreated(CancellationToken cancellationToken = default)
+        {
+            return ExecuteInTryCatch<Driver>(async () =>
+            {
+                var existingDriver = await this.context.Drivers.LastOrDefaultAsync();
+
+                if (existingDriver == null)
+                    throw new NullReferenceException("not items in table");
+
+
+                return existingDriver;
+            }, "GetLatestCreated Driver");
         }
     }
 }

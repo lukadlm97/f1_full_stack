@@ -50,9 +50,10 @@ namespace WebApi.Controllers
 
         [MapToApiVersion("1.0")]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateDriver([FromBody] Domain.Drivers.Driver driver, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateDriver([FromBody] DTOs.Drivers.DriverDto driver, CancellationToken cancellationToken = default)
         {
-            if (!await this.driversUnitOfWork.Drivers.Insert(this.mapper.Map<Domain.Drivers.Driver>(driver)))
+            var mappedDriver = this.mapper.Map<Domain.Drivers.Driver>(driver);
+            if (!await this.driversUnitOfWork.Drivers.Insert(mappedDriver))
                 return BadRequest("Driver not inserted!!!");
 
             if(await this.driversUnitOfWork.Commit() == 0)
@@ -60,7 +61,9 @@ namespace WebApi.Controllers
                 return BadRequest("Driver insert not confirmed!!!");
             }
 
-            return Ok();
+
+
+            return Ok(await this.driversUnitOfWork.Drivers.GetById(mappedDriver.Id));
         }
 
         //PUT: api/drivers/{id}/update
@@ -97,7 +100,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver deleted not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(id);
         }
 
 

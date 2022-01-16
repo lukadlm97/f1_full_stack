@@ -16,5 +16,6 @@ namespace Domain.Drivers
         Task<bool> DriverRetirement(int id, CancellationToken cancellationToken = default);
         Task<bool> DriverReactivation(int id, CancellationToken cancellationToken = default);
         Task<bool> ChangeCitizenship(int id, int countryId,CancellationToken cancellationToken = default);
+        Task<Driver> GetLatestCreated(CancellationToken cancellationToken = default);
     }
 }
