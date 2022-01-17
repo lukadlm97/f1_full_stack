@@ -70,7 +70,7 @@ namespace WebApi.Controllers
 
         [MapToApiVersion("1.0")]
         [HttpPost("{id}/update")]
-        public async Task<IActionResult> UpdateDriver(int id, [FromBody] Domain.Drivers.Driver driver, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateDriver(int id, [FromBody] DTOs.Drivers.DriverDto driver, CancellationToken cancellationToken = default)
         {
             var entity = this.mapper.Map<Domain.Drivers.Driver>(driver);
             entity.Id = id;
@@ -83,7 +83,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver update not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(await this.driversUnitOfWork.Drivers.GetById(entity.Id));
         }
 
         //PUT: api/drivers/{id}/update
@@ -116,7 +116,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver retaire not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(await this.driversUnitOfWork.Drivers.GetById(id));
         }
 
 
@@ -132,7 +132,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver retire not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(await this.driversUnitOfWork.Drivers.GetById(id));
         }
 
         [MapToApiVersion("1.0")]
@@ -163,7 +163,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver change citizenship not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(await this.driversUnitOfWork.Drivers.GetById(id));
         }
     }
 }
