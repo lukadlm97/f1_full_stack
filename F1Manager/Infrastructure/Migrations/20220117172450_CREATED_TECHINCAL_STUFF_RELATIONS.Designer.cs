@@ -4,14 +4,16 @@ using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220117172450_CREATED_TECHINCAL_STUFF_RELATIONS")]
+    partial class CREATED_TECHINCAL_STUFF_RELATIONS
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +31,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ConstructorId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DateOfEnd")
+                    b.Property<DateTime>("DateOfEnd")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfSign")
@@ -41,16 +43,11 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TechnicalStuffId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TechnicalStuffRoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ConstructorId");
 
                     b.HasIndex("TechnicalStuffId");
-
-                    b.HasIndex("TechnicalStuffRoleId");
 
                     b.ToTable("ConstrucotrsStuffContracts");
                 });
@@ -105,6 +102,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Base")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ChiefTechnicalOfficer")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
@@ -130,6 +130,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShortName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TechnicalDirector")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -426,24 +429,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("TechnicalStuffs");
                 });
 
-            modelBuilder.Entity("Domain.TechnicalStuffRole.TechnicalStuffRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RoleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TechnicalStuffRoles");
-                });
-
             modelBuilder.Entity("Domain.Users.User", b =>
                 {
                     b.Property<int>("Id")
@@ -519,12 +504,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.TechnicalStuff.TechnicalStuff", "TechnicalStuff")
                         .WithMany()
                         .HasForeignKey("TechnicalStuffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.TechnicalStuffRole.TechnicalStuffRole", "TechnicalStuffRole")
-                        .WithMany()
-                        .HasForeignKey("TechnicalStuffRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

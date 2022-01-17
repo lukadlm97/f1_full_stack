@@ -135,8 +135,6 @@ namespace Infrastructure.DataAccess.Repositores
                 existingConstructor.ShortName = entity.ShortName;
                 existingConstructor.FirstEntry = entity.FirstEntry;
                 existingConstructor.LastEntry = entity.LastEntry;
-                existingConstructor.TechnicalDirector = entity.TechnicalDirector;
-                existingConstructor.ChiefTechnicalOfficer = entity.ChiefTechnicalOfficer;
                 existingConstructor.Website = entity.Website;
                 existingConstructor.UpdatedBy = entity.UpdatedBy;
                 existingConstructor.UpdatedDate = entity.UpdatedDate;
