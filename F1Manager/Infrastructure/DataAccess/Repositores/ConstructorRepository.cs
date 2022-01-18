@@ -45,8 +45,9 @@ namespace Infrastructure.DataAccess.Repositores
                 if (forDelete == null)
                     return false;
 
+                forDelete.IsDeleted = true;
 
-                context.Constructors.Remove(forDelete);
+                context.Constructors.Update(forDelete);
 
                 return true;
             }, "Delete Constructors");
@@ -56,7 +57,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<List<Constructor>>(async () =>
             {
-                return await this.context.Constructors.ToListAsync();
+                return await this.context.Constructors.Where(x=>!x.IsDeleted && x.IsActive).ToListAsync();
             }, "GetAll Constructors");
         }
 

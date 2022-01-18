@@ -1,4 +1,4 @@
-﻿using Domain.TechnicalStuffRole;
+﻿using Domain.TechnicalStaffRole;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -8,22 +8,22 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Repositores
 {
-    public class TechnicalStuffRoleRepository : ITechnicalStuffRoleRepository
+    public class TechnicalStaffRoleRepository : ITechnicalStaffRoleRepository
     {
 
         private readonly AppDbContext context;
-        private readonly ILogger<TechnicalStuffRoleRepository> logger;
+        private readonly ILogger<TechnicalStaffRoleRepository> logger;
 
-        public TechnicalStuffRoleRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
+        public TechnicalStaffRoleRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            this.logger = loggerFactory.CreateLogger<TechnicalStuffRoleRepository>();
+            this.logger = loggerFactory.CreateLogger<TechnicalStaffRoleRepository>();
         }
-        public Task<IEnumerable<TechnicalStuffRole>> GetAll()
+        public Task<IEnumerable<TechnicalStaffRole>> GetAll()
         {
-            return ExecuteInTryCatch<IEnumerable<TechnicalStuffRole>>(async () =>
+            return ExecuteInTryCatch<IEnumerable<TechnicalStaffRole>>(async () =>
             {
-                return this.context.TechnicalStuffRoles.ToList();
+                return this.context.TechnicalStaffRoles.ToList();
             }, "GetAll Roles");
         }
         private Task<T> ExecuteInTryCatch<T>(Func<Task<T>> databaseFunction, string errorMessage)

@@ -43,16 +43,16 @@ namespace WebApi.Controllers
         {
             try
             {
+                var constructorMapped = this.mapper.Map<Domain.Constructors.Constructor>(constructor);
+                if (!await this.constructorsUnitOfWork.Constructors.Insert(constructorMapped))
+                    return BadRequest("Constructor not inserted!!!");
 
-            if (!await this.constructorsUnitOfWork.Constructors.Insert(this.mapper.Map<Domain.Constructors.Constructor>(constructor)))
-                return BadRequest("Constructor not inserted!!!");
+                if (await this.constructorsUnitOfWork.Commit() == 0)
+                {
+                    return BadRequest("Constructor insert not confirmed!!!");
+                }
 
-            if (await this.constructorsUnitOfWork.Commit() == 0)
-            {
-                return BadRequest("Constructor insert not confirmed!!!");
-            }
-
-            return Ok();
+            return Ok(constructorMapped);
             }catch(Exception e)
             {
 
@@ -77,7 +77,7 @@ namespace WebApi.Controllers
                 return BadRequest("Constructor update not confirmed!!!");
             }
 
-            return Ok();
+            return Ok(entity);
         }
 
         //PUT: api/drivers/{id}/update

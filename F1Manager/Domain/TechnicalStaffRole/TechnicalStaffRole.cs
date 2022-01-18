@@ -1,10 +1,10 @@
 ﻿using Domain.Base;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Domain.TechnicalStuffRole
+namespace Domain.TechnicalStaffRole
 {
-    [Table("TechnicalStuffRoles")]
-    public class TechnicalStuffRole : DeleteEntity<int>
+    [Table("TechnicalStaffRoles")]
+    public class TechnicalStaffRole : DeleteEntity<int>
     {
         public string RoleName { get; set; }
     }

@@ -50,12 +50,18 @@ namespace WebApi
             services.AddScoped<Infrastructure.UnitOfWorks.ConstructorRacingDetails.IConstructorRacingDetailsUnitOfWork, Infrastructure.UnitOfWorks.ConstructorRacingDetails.ConstructorRacingDetailsUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.Countries.ICountriesUnitOfWork, Infrastructure.UnitOfWorks.Countries.CountriesUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.Constructors.ICounstructorUnitOfWork, Infrastructure.UnitOfWorks.Constructors.ConstructorUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.TechnicalStuffRole.ITechnicalStaffRoleUnitOfWork, Infrastructure.UnitOfWorks.TechnicalStuffRole.TechnicalStaffRoleUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.TechnicalStuff.ITechnicalStaffUnitOfWork, Infrastructure.UnitOfWorks.TechnicalStuff.TechnicalStaffUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsStaffContracts.IConstructorsStaffContractsUnitOfWork, Infrastructure.UnitOfWorks.ConstructorsStaffContracts.ConstructorsStaffContractsUoW>();
 
             services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
             services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
             services.AddScoped<Domain.ConstructorRacingDetails.IConstructorRacingDetail, Infrastructure.DataAccess.Repositores.ConstructorRacingDetailRepository>();
             services.AddScoped<Domain.Countries.ICountryRepository, Infrastructure.DataAccess.Repositores.CountryRepository>();
             services.AddScoped<Domain.Drivers.IDriverRepository, Infrastructure.DataAccess.Repositores.DriverRepository>();
+            services.AddScoped<Domain.TechnicalStaffRole.ITechnicalStaffRoleRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRoleRepository>();
+            services.AddScoped<Domain.TechnicalStaff.ITechnicalStaffRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRepository>();
+            services.AddScoped<Domain.ConstructorsStaffContracts.IConstructorsStaffContractsRepository, Infrastructure.DataAccess.Repositores.ConstructorStaffContractRepository>();
 
             services.AddSingleton<IJwtFactory, JwtFactory>();
 

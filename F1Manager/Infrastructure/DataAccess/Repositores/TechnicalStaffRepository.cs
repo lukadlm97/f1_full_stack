@@ -1,4 +1,4 @@
-﻿using Domain.TechnicalStuff;
+﻿using Domain.TechnicalStaff;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,49 +9,49 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DataAccess.Repositores
 {
-    public class TechnicalStuffRepository : ITechnicalStuffRepository
+    public class TechnicalStaffRepository : ITechnicalStaffRepository
     {
         private readonly AppDbContext context;
-        private readonly ILogger<TechnicalStuffRepository> logger;
+        private readonly ILogger<TechnicalStaffRepository> logger;
 
-        public TechnicalStuffRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
+        public TechnicalStaffRepository(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            this.logger = loggerFactory.CreateLogger<TechnicalStuffRepository>();
+            this.logger = loggerFactory.CreateLogger<TechnicalStaffRepository>();
         }
         public Task<bool> Delete(int id)
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
-                var forDelete = await context.TechnicalStuffs.FirstOrDefaultAsync(x => x.Id == id);
+                var forDelete = await context.TechnicalStaffs.FirstOrDefaultAsync(x => x.Id == id);
                 if (forDelete == null)
                     return false;
 
                 forDelete.IsDeleted = true;
 
-                context.TechnicalStuffs.Update(forDelete);
+                context.TechnicalStaffs.Update(forDelete);
 
                 return true;
             }, "Delete error occured");
         }
 
-        public Task<IEnumerable<TechnicalStuff>> GetAll()
+        public Task<IEnumerable<TechnicalStaff>> GetAll()
         {
-            return ExecuteInTryCatch<IEnumerable<TechnicalStuff>>(async () =>
+            return ExecuteInTryCatch<IEnumerable<TechnicalStaff>>(async () =>
             {
-                return await context.TechnicalStuffs.Where(x=>!x.IsDeleted).ToListAsync();
+                return await context.TechnicalStaffs.Where(x=>!x.IsDeleted).ToListAsync();
             }, "GetAll TechnicalStuff");
         }
 
-        public Task<TechnicalStuff> GetById(int id)
+        public Task<TechnicalStaff> GetById(int id)
         {
-            return ExecuteInTryCatch<TechnicalStuff>(async () =>
+            return ExecuteInTryCatch<TechnicalStaff>(async () =>
             {
-                return await context.TechnicalStuffs.FirstOrDefaultAsync(x=>x.Id==id);
+                return await context.TechnicalStaffs.FirstOrDefaultAsync(x=>x.Id==id);
             }, "GetById TechnicalStuff");
         }
 
-        public Task<bool> Insert(TechnicalStuff technicalStuff)
+        public Task<bool> Insert(TechnicalStaff technicalStuff)
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
@@ -61,7 +61,7 @@ namespace Infrastructure.DataAccess.Repositores
                     return false;
 
                 technicalStuff.Country = country;
-                var item = await context.TechnicalStuffs.AddAsync(technicalStuff);
+                var item = await context.TechnicalStaffs.AddAsync(technicalStuff);
 
                 return true;
             }, "Insert TechnicalStuff");

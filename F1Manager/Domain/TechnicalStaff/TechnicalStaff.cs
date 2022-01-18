@@ -3,9 +3,10 @@ using Domain.Countries;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Domain.TechnicalStuff
+namespace Domain.TechnicalStaff
 {
-    public class TechnicalStuff : DeleteEntity<int>
+    [Table("TechnicalStaff")]
+    public class TechnicalStaff : DeleteEntity<int>
     {
         public string Forename { get; set; }
         public string Surname { get; set; }

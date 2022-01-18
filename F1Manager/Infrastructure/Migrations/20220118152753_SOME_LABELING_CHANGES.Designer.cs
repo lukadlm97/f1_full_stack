@@ -4,20 +4,58 @@ using Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220118152753_SOME_LABELING_CHANGES")]
+    partial class SOME_LABELING_CHANGES
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Domain.ConstrucotrsStuffContracts.ConstructorsStuffContracts", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ConstructorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DateOfEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateOfSign")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TechnicalStaffId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TechnicalStaffRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConstructorId");
+
+                    b.HasIndex("TechnicalStaffId");
+
+                    b.HasIndex("TechnicalStaffRoleId");
+
+                    b.ToTable("ConstrucotrsStaffContracts");
+                });
 
             modelBuilder.Entity("Domain.ConstructorRacingDetails.ConstructorsRacingDetail", b =>
                 {
@@ -110,42 +148,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("Constructors");
-                });
-
-            modelBuilder.Entity("Domain.ConstructorsStaffContracts.ConstructorsStaffContracts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ConstructorId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DateOfEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateOfSign")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TechnicalStaffId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TechnicalStaffRoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConstructorId");
-
-                    b.HasIndex("TechnicalStaffId");
-
-                    b.HasIndex("TechnicalStaffRoleId");
-
-                    b.ToTable("ConstructorsStaffContracts");
                 });
 
             modelBuilder.Entity("Domain.Contracts.Contract", b =>
@@ -508,6 +510,27 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Domain.ConstrucotrsStuffContracts.ConstructorsStuffContracts", b =>
+                {
+                    b.HasOne("Domain.Constructors.Constructor", "Constructor")
+                        .WithMany()
+                        .HasForeignKey("ConstructorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.TechnicalStaff.TechnicalStaff", "TechnicalStaff")
+                        .WithMany()
+                        .HasForeignKey("TechnicalStaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.TechnicalStaffRole.TechnicalStaffRole", "TechnicalStaffRole")
+                        .WithMany()
+                        .HasForeignKey("TechnicalStaffRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.ConstructorRacingDetails.ConstructorsRacingDetail", b =>
                 {
                     b.HasOne("Domain.RacingChampionship.RacingChampionship", "RacingChampionship")
@@ -528,27 +551,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Countries.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.ConstructorsStaffContracts.ConstructorsStaffContracts", b =>
-                {
-                    b.HasOne("Domain.Constructors.Constructor", "Constructor")
-                        .WithMany()
-                        .HasForeignKey("ConstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.TechnicalStaff.TechnicalStaff", "TechnicalStaff")
-                        .WithMany()
-                        .HasForeignKey("TechnicalStaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.TechnicalStaffRole.TechnicalStaffRole", "TechnicalStaffRole")
-                        .WithMany()
-                        .HasForeignKey("TechnicalStaffRoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
