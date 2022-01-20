@@ -1,40 +1,38 @@
-﻿using AutoMapper;
+﻿using Application.Services;
+using AutoMapper;
 using Domain.Users;
 using Infrastructure.UnitOfWorks.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using WebApi.AuthorizationAssets;
 using WebApi.DTOs;
 using WebApi.Models;
 using WebApi.Utilities;
 
 namespace WebApi.Controllers
 {
-    [Authorize(Policy = "CanViewUsers")]
+    [Authorize(Policy = "ShouldBeAAdmin")]
     [Route("api/account")]
     [ApiController]
     public class AccountControllers : ControllerBase
     {
         private readonly IUsersUoW userUoW;
+        private readonly IUserService userService;
         private readonly IMapper mapper;
         private readonly ClaimsPrincipal caller;
-        private readonly JwtIssuerOptions jwtOptions;
-        private readonly IJwtFactory jwtFactory;
+        private readonly IJWTService jWTService;
 
-        public AccountControllers(IUsersUoW userUoW, IConfiguration config, IMapper mapper, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IHttpContextAccessor httpContextAccessor)
+        public AccountControllers(IUsersUoW userUoW, IConfiguration config, IMapper mapper,Application.Services.IUserService userService,Application.Services.IJWTService jWTService, IHttpContextAccessor httpContextAccessor)
         {
             this.userUoW = userUoW;
-            this.jwtFactory = jwtFactory;
+            this.userService = userService;
             this.mapper = mapper;
             this.caller = httpContextAccessor.HttpContext.User;
-            this.jwtOptions = jwtOptions.Value;
+            this.jWTService = jWTService;
         }
 
         // GET: api/account/users
@@ -54,35 +52,18 @@ namespace WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto user)
         {
-            var identity = await GetClaimsIdentity(user.UserName, user.Password);
+            var identity = await userService.GetIndentity(user.UserName, user.Password);
             if (identity == null)
-                return Unauthorized();
+                return NotFound();
 
-            var jwt = await Tokens.GenerateJwt(identity, jwtFactory, user.UserName, jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+            var jwt = jWTService.GenerateToken(identity);
 
-            return new OkObjectResult(jwt);
+            return new OkObjectResult(new{
+                 token = jwt
+            });
         }
 
-        private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
-        {
-            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
-                return await Task.FromResult<ClaimsIdentity>(null);
-
-            // get the user to verifty
-            var userToVerify = await this.userUoW.Users.GetObjectByUsername(userName);
-
-            if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);
-
-            // check the credentials
-            var user = await this.userUoW.Users.Login(userToVerify.UserName.ToLower(), password.ToLower());
-            if (user != null)
-            {
-                return await Task.FromResult(jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString(), user.Role.RoleName));
-            }
-
-            // Credentials are invalid, or account doesn't exist
-            return await Task.FromResult<ClaimsIdentity>(null);
-        }
+       
 
         // POST: api/account/assigncountry/2
         [AllowAnonymous]
@@ -111,12 +92,12 @@ namespace WebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserDto user)
         {
-            var createdUser = await this.userUoW.Users.Register(mapper.Map<User>(user), user.Password.ToLower());
-            var countOfChanges = await this.userUoW.Commit();
+            var createdUserId = await this.userService.Register(mapper.Map<User>(user), user.Password.ToLower());
+          
 
-            if (countOfChanges != 0)
+            if (createdUserId != 0)
             {
-                return Ok(this.mapper.Map<RegistrationView>(createdUser));
+                return Ok(await this.userUoW.Users.GetByID(createdUserId));
             }
             return BadRequest();
         }

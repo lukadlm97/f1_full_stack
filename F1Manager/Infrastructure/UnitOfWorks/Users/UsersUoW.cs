@@ -10,10 +10,10 @@ namespace Infrastructure.UnitOfWorks.Users
     {
         private readonly AppDbContext context;
 
-        public UsersUoW(AppDbContext dbContext,IUserRepository userRepository,ILoggerFactory loggerFactory)
+        public UsersUoW(AppDbContext dbContext,ILoggerFactory loggerFactory)
         {
             this.context = dbContext;
-            Users = userRepository;
+            Users = new UserRepository(dbContext,loggerFactory);
         }
 
         public IUserRepository Users { get; set; }

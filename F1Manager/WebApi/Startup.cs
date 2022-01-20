@@ -13,9 +13,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using System;
 using System.Text;
-using WebApi.AuthorizationAssets;
 using WebApi.Extensions;
 using WebApi.Utilities;
 
@@ -43,6 +41,8 @@ namespace WebApi
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=f1m;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"),
             ServiceLifetime.Transient);
 
+            services.Configure<Domain.Configurations.JWT.JwtSettings>(Configuration.GetSection("JwtSettings"));
+
             services.AddMapperConfiguration();
 
             services.AddScoped<Infrastructure.UnitOfWorks.Users.IUsersUoW, Infrastructure.UnitOfWorks.Users.UsersUoW>();
@@ -63,7 +63,6 @@ namespace WebApi
             services.AddScoped<Domain.TechnicalStaff.ITechnicalStaffRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRepository>();
             services.AddScoped<Domain.ConstructorsStaffContracts.IConstructorsStaffContractsRepository, Infrastructure.DataAccess.Repositores.ConstructorStaffContractRepository>();
 
-            services.AddSingleton<IJwtFactory, JwtFactory>();
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -81,53 +80,46 @@ namespace WebApi
             services.AddSingleton(mapper);
 
 
-            SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]));
-            var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
+            services.AddScoped<Application.Services.IUserService, Infrastructure.Authentication.UserService>();
+            services.AddScoped<Application.Services.IJWTService, Infrastructure.Authentication.JWTService>();
 
-            // Configure JwtIssuerOptions
-            services.Configure<JwtIssuerOptions>(options =>
+            // configure jwt authentication
+            var appSettingsSection = Configuration.GetSection("JwtSettings");
+            var appSettings = appSettingsSection.Get<Domain.Configurations.JWT.JwtSettings>();
+
+            services.AddAuthentication(o =>
             {
-                options.Issuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                options.Audience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)];
-                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(appSettings.Secret)),
+                    ValidIssuer = appSettings.Issuer,
+                    ValidAudience = appSettings.Audience
+                };
             });
 
-            var tokenValidationParameters = new TokenValidationParameters
+            services.AddAuthorization(config =>
             {
-                ValidateIssuer = true,
-                ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
-
-                ValidateAudience = true,
-                ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
-
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _signingKey,
-
-                RequireExpirationTime = false,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(configureOptions =>
-            {
-                configureOptions.ClaimsIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)];
-                configureOptions.TokenValidationParameters = tokenValidationParameters;
-                configureOptions.SaveToken = true;
-            });
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("CanViewUsers", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin));
-                options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
+                config.AddPolicy("ShouldBeAAdmin", options =>
+                {
+                    options.RequireAuthenticatedUser();
+                    options.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    options.Requirements.Add(new Infrastructure.Authentication.Requirements.ShouldBeAAdminRequirement());
+                });
+               /* options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
                 options.AddPolicy("ContentChanges", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.ContentWriter));
-                //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));
+                //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));*/
             });
 
-            services.AddSingleton<IAuthorizationHandler, RoleHandler>();
+            services.AddSingleton<IAuthorizationHandler, Infrastructure.Authentication.Handlers.ShouldBeAAdminAuthorizationHandler> ();
 
             services.AddApiVersioning(setup =>
             {

@@ -67,6 +67,7 @@ namespace Infrastructure.DataAccess.Repositores
             return ExecuteInTryCatch<User>(async () =>
             {
                 return await context.Set<User>()
+                .Include(x=>x.Role)
                         .FirstOrDefaultAsync(x => x.UserName.Contains(username));
             }, "GetObjectByName User");
         }
@@ -84,13 +85,13 @@ namespace Infrastructure.DataAccess.Repositores
             }, "Login User");
         }
 
-        public Task<User> Register(User newUser, string password)
+        public Task<bool> Register(User newUser, string password)
         {
-            return ExecuteInTryCatch<User>(async () =>
+            return ExecuteInTryCatch<bool>(async () =>
             {
                 if (await UserExists(newUser.UserName))
                 {
-                    return null;
+                    return false;
                 }
 
                 byte[] passwordHash, passwordSalt;
@@ -104,7 +105,7 @@ namespace Infrastructure.DataAccess.Repositores
 
                 var entry = await context.Users.AddAsync(newUser);
 
-                return entry.Entity;
+                return true;
             }, "Register User");
         }
 

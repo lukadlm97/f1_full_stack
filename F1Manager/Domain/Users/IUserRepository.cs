@@ -12,7 +12,7 @@ namespace Domain.Users
 
         Task<bool> UserExists(string username);
 
-        Task<User> Register(User newUser, string password);
+        Task<bool> Register(User newUser, string password);
 
         Task<User> Login(string username, string password);
 
