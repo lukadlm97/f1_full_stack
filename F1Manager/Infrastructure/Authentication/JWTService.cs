@@ -1,11 +1,8 @@
 ﻿using Domain.Users;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Authentication
 {
@@ -17,6 +14,7 @@ namespace Infrastructure.Authentication
         {
             this.jwtOptions = jwtOptions.Value;
         }
+
         public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
