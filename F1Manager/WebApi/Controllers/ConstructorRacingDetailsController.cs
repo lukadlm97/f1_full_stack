@@ -35,10 +35,20 @@ namespace WebApi.Controllers
 
 
         [MapToApiVersion("1.0")]
-        [HttpGet("init/{constructorId}")]
-        public async Task<IActionResult> CreateInitState(int constructorId)
+        [HttpPost("init/")]
+        public async Task<IActionResult> CreateInitState([FromBody]DTOs.ConstructorsResult.ConstructorInitDto constructor)
         {
-            if(!await this.constructorsUnitOfWork.Constructors.CreateInitState(constructorId))
+            var newConstructor = new Domain.ConstructorRacingDetails.ConstructorsRacingDetail()
+            {
+                RacingChampionship = new Domain.RacingChampionship.RacingChampionship
+                {
+                    Id = constructor.ChampionshipId
+                },
+                ConstructorId = constructor.ConstructorId
+            };
+            
+            if (!await this.constructorsUnitOfWork.Constructors
+                                        .CreateInitState(newConstructor))
             {
                 return NotFound("Problem on registration of constructors racing detials.");
             }
@@ -48,7 +58,8 @@ namespace WebApi.Controllers
                 return NotFound("Problem on registration of constructors racing detials.");
             }
 
-            return Ok();
+
+            return Ok(constructorsUnitOfWork.Constructors.GetById(newConstructor.Id));
         }
 
         [MapToApiVersion("1.0")]
@@ -57,6 +68,7 @@ namespace WebApi.Controllers
         {
             var racingdetails = mapper.Map<Domain.ConstructorRacingDetails.ConstructorsRacingDetail>(constructorDetails);
             racingdetails.ConstructorId = constructorId;
+            racingdetails.CompetitionId = constructorDetails.ChampionshipId;
             if (!await this.constructorsUnitOfWork.Constructors.Insert(racingdetails))
             {
                 return NotFound("Problem on registration of constructors racing detials.");
@@ -67,7 +79,7 @@ namespace WebApi.Controllers
                 return NotFound("Problem on registration of constructors racing detials.");
             }
 
-            return Ok();
+            return Ok(await constructorsUnitOfWork.Constructors.GetById(racingdetails.Id));
         }
 
         [MapToApiVersion("1.0")]

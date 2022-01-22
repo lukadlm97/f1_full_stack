@@ -36,20 +36,22 @@ namespace Infrastructure.DataAccess.Repositores
             }, "Update ConstructorsRacingDetails");
         }
 
-        public Task<bool> CreateInitState(int constructorId)
+        public Task<bool> CreateInitState(ConstructorsRacingDetail constructorsRacingDetail)
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
                 var originalConstructor = await this.appContext.Constructors
-                                                    .FirstOrDefaultAsync(x => x.Id == constructorId);
+                                                    .FirstOrDefaultAsync(x => x.Id == constructorsRacingDetail.ConstructorId);
                 var existRacingDetails = await  this.appContext.ConstructorsRacingDetails
-                                                    .FirstOrDefaultAsync(x => x.ConstructorId == constructorId);
-
-                if (originalConstructor == null || existRacingDetails!=null)
+                                                    .FirstOrDefaultAsync(x => x.ConstructorId == constructorsRacingDetail.ConstructorId);
+                var originalChampionship = await this.appContext.RacingChampionships
+                                                   .FirstOrDefaultAsync(x => x.Id == constructorsRacingDetail.RacingChampionship.Id);
+                if (originalConstructor == null || existRacingDetails!=null || originalChampionship==null)
                     return false;
 
-                var entity = new ConstructorsRacingDetail() { Constructor=originalConstructor};
-                await this.appContext.ConstructorsRacingDetails.AddAsync(entity);
+                constructorsRacingDetail.Constructor = originalConstructor; 
+                constructorsRacingDetail.RacingChampionship = originalChampionship; 
+                await this.appContext.ConstructorsRacingDetails.AddAsync(constructorsRacingDetail);
 
                 return true;
             }, "Insert ConstructorsRacingDetails");
@@ -74,6 +76,14 @@ namespace Infrastructure.DataAccess.Repositores
             return ExecuteInTryCatch<List<ConstructorsRacingDetail>>(async () =>
             {
                 return await this.appContext.ConstructorsRacingDetails.ToListAsync();
+            }, "GetAll ConstructorsRacingDetails");
+        }
+
+        public Task<ConstructorsRacingDetail> GetById(int id)
+        {
+            return ExecuteInTryCatch<ConstructorsRacingDetail>(async () =>
+            {
+                return await this.appContext.ConstructorsRacingDetails.FirstOrDefaultAsync(x=>x.Id==id);
             }, "GetAll ConstructorsRacingDetails");
         }
 
@@ -187,11 +197,14 @@ namespace Infrastructure.DataAccess.Repositores
                                                     .FirstOrDefaultAsync(x => x.Id == entity.ConstructorId);
                 var existRacingDetails = await this.appContext.ConstructorsRacingDetails
                                                   .FirstOrDefaultAsync(x => x.ConstructorId == entity.ConstructorId);
+                var originalChampionship = await this.appContext.RacingChampionships
+                                      .FirstOrDefaultAsync(x => x.Id == entity.CompetitionId);
 
-                if (originalConstructor == null || existRacingDetails!= null)
+                if (originalConstructor == null || existRacingDetails!= null || originalChampionship==null)
                     return false;
 
                 entity.Constructor = originalConstructor;
+                entity.RacingChampionship = originalChampionship;
                 await this.appContext.ConstructorsRacingDetails.AddAsync(entity);
 
                 return true;
