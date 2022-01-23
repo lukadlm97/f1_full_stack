@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAllConstructors(int constructorId)
         {
             var constructors = await this.constructorsUnitOfWork.Constructors.GetAll().ConfigureAwait(false);
-            var constructor =  constructors.FirstOrDefault(x => x.ConstructorId == constructorId);
+            var constructor = constructors.FirstOrDefault(x => x.ConstructorId == constructorId);
 
             if (constructor == null)
                 return NotFound("No registered constructors racing detials.");
@@ -33,20 +33,18 @@ namespace WebApi.Controllers
             return Ok(constructor);
         }
 
-
         [MapToApiVersion("1.0")]
         [HttpPost("init/")]
-        public async Task<IActionResult> CreateInitState([FromBody]DTOs.ConstructorsResult.ConstructorInitDto constructor)
+        public async Task<IActionResult> CreateInitState
+                                    ([FromBody] DTOs.ConstructorsResult.ConstructorInitDto constructorDetails)
         {
-            var newConstructor = new Domain.ConstructorRacingDetails.ConstructorsRacingDetail()
+            var newConstructor = mapper.Map<Domain.ConstructorRacingDetails.ConstructorsRacingDetail>(constructorDetails);
+
+            if (await this.constructorsUnitOfWork.Constructors.IsCreated(newConstructor.ConstructorId))
             {
-                RacingChampionship = new Domain.RacingChampionship.RacingChampionship
-                {
-                    Id = constructor.ChampionshipId
-                },
-                ConstructorId = constructor.ConstructorId
-            };
-            
+                return Conflict("for constructor exist racing details");
+            }
+
             if (!await this.constructorsUnitOfWork.Constructors
                                         .CreateInitState(newConstructor))
             {
@@ -58,23 +56,27 @@ namespace WebApi.Controllers
                 return NotFound("Problem on registration of constructors racing detials.");
             }
 
-
-            return Ok(constructorsUnitOfWork.Constructors.GetById(newConstructor.Id));
+            return Ok(await constructorsUnitOfWork.Constructors.GetById(newConstructor.Id));
         }
 
         [MapToApiVersion("1.0")]
-        [HttpPost("create/{constructorId}")]
-        public async Task<IActionResult> CreateExistingState([FromBody] DTOs.ConstructorsResult.ConstructorRacingResultDto constructorDetails, int constructorId)
+        [HttpPost("create/")]
+        public async Task<IActionResult> CreateExistingState([FromBody] DTOs.ConstructorsResult.ConstructorRacingResultDto constructorDetails)
         {
             var racingdetails = mapper.Map<Domain.ConstructorRacingDetails.ConstructorsRacingDetail>(constructorDetails);
-            racingdetails.ConstructorId = constructorId;
-            racingdetails.CompetitionId = constructorDetails.ChampionshipId;
+         
+
+            if (await this.constructorsUnitOfWork.Constructors.IsCreated(racingdetails.ConstructorId))
+            {
+                return Conflict("for constructor exist racing details");
+            }
+
             if (!await this.constructorsUnitOfWork.Constructors.Insert(racingdetails))
             {
                 return NotFound("Problem on registration of constructors racing detials.");
             }
 
-            if(await this.constructorsUnitOfWork.Commit() ==0)
+            if (await this.constructorsUnitOfWork.Commit() == 0)
             {
                 return NotFound("Problem on registration of constructors racing detials.");
             }
@@ -98,14 +100,14 @@ namespace WebApi.Controllers
                 return NotFound("Problem on registration of constructors racing detials.");
             }
 
-            return Ok();
+            return Ok(await this.constructorsUnitOfWork.Constructors.GetById(racingdetails.Id));
         }
 
         [MapToApiVersion("1.0")]
         [HttpDelete("delete/{constructorId}")]
         public async Task<IActionResult> DeleteResult(int constructorId)
         {
-            var constructorRacingDetails = new Domain.ConstructorRacingDetails.ConstructorsRacingDetail() { ConstructorId=constructorId};
+            var constructorRacingDetails = new Domain.ConstructorRacingDetails.ConstructorsRacingDetail() { ConstructorId = constructorId };
             if (!await this.constructorsUnitOfWork.Constructors.Delete(constructorRacingDetails))
             {
                 return NotFound("Problem on registration of constructors racing detials.");
@@ -119,12 +121,10 @@ namespace WebApi.Controllers
             return Ok();
         }
 
-
         [MapToApiVersion("1.0")]
-        [HttpGet("constructorsChampionships/{constructorId}")]
-        public async Task<IActionResult> IncrementConstructorsChampionships( int constructorId)
+        [HttpPost("constructorsChampionships/{constructorId}")]
+        public async Task<IActionResult> IncrementConstructorsChampionships(int constructorId)
         {
-            
             if (!await this.constructorsUnitOfWork.Constructors.IncrementConstructorChampionships(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -139,10 +139,9 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpGet("driverChampionships/{constructorId}")]
+        [HttpPost("driverChampionships/{constructorId}")]
         public async Task<IActionResult> IncrementDriverChampionships(int constructorId)
         {
-
             if (!await this.constructorsUnitOfWork.Constructors.IncrementDriverChampionships(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -157,10 +156,9 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpGet("raceVictories/{constructorId}")]
+        [HttpPost("raceVictories/{constructorId}")]
         public async Task<IActionResult> IncrementRaceVictories(int constructorId)
         {
-
             if (!await this.constructorsUnitOfWork.Constructors.IncrementRaceVictories(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -175,10 +173,9 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpGet("podiums/{constructorId}")]
+        [HttpPost("podiums/{constructorId}")]
         public async Task<IActionResult> IncrementPodiums(int constructorId)
         {
-
             if (!await this.constructorsUnitOfWork.Constructors.IncrementPodiums(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -192,12 +189,10 @@ namespace WebApi.Controllers
             return Ok();
         }
 
-
         [MapToApiVersion("1.0")]
-        [HttpGet("polPositions/{constructorId}")]
+        [HttpPost("polPositions/{constructorId}")]
         public async Task<IActionResult> IncrementPolPositions(int constructorId)
         {
-
             if (!await this.constructorsUnitOfWork.Constructors.IncrementPolPositions(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -212,10 +207,9 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpGet("fastesLaps/{constructorId}")]
+        [HttpPost("fastesLaps/{constructorId}")]
         public async Task<IActionResult> IncrementFastesLaps(int constructorId)
         {
-
             if (!await this.constructorsUnitOfWork.Constructors.IncrementFastesLaps(constructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
@@ -230,11 +224,10 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpGet("fastesLaps/{constructorId}/{newConstructorId}")]
-        public async Task<IActionResult> ChangeToApproprateConstructor(int constructorId,int newConstructorId)
+        [HttpPost("fastesLaps/{constructorId}/{newConstructorId}")]
+        public async Task<IActionResult> ChangeToApproprateConstructor(int constructorId, int newConstructorId)
         {
-
-            if (!await this.constructorsUnitOfWork.Constructors.ChangeToApproprateConstructor(constructorId,newConstructorId))
+            if (!await this.constructorsUnitOfWork.Constructors.ChangeToApproprateConstructor(constructorId, newConstructorId))
             {
                 return NotFound("Problem on registration IncrementConstructorChampionships.");
             }
@@ -246,7 +239,5 @@ namespace WebApi.Controllers
 
             return Ok();
         }
-
-
     }
 }

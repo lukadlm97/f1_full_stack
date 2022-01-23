@@ -42,11 +42,11 @@ namespace Infrastructure.DataAccess.Repositores
             {
                 var originalConstructor = await this.appContext.Constructors
                                                     .FirstOrDefaultAsync(x => x.Id == constructorsRacingDetail.ConstructorId);
-                var existRacingDetails = await  this.appContext.ConstructorsRacingDetails
-                                                    .FirstOrDefaultAsync(x => x.ConstructorId == constructorsRacingDetail.ConstructorId);
+               
                 var originalChampionship = await this.appContext.RacingChampionships
-                                                   .FirstOrDefaultAsync(x => x.Id == constructorsRacingDetail.RacingChampionship.Id);
-                if (originalConstructor == null || existRacingDetails!=null || originalChampionship==null)
+                                                   .FirstOrDefaultAsync(x => x.Id == constructorsRacingDetail.CompetitionId);
+                
+                if (originalConstructor == null || originalChampionship==null)
                     return false;
 
                 constructorsRacingDetail.Constructor = originalConstructor; 
@@ -211,6 +211,19 @@ namespace Infrastructure.DataAccess.Repositores
             }, "Insert ConstructorsRacingDetails");
         }
 
+        public Task<bool> IsCreated(int constructorId)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                var forDelete = await this.appContext.ConstructorsRacingDetails.FirstOrDefaultAsync(x => x.ConstructorId == constructorId);
+                if (forDelete != null)
+                    return true;
+
+                return false;
+            }, "IsCreated ConstructorsRacingDetails");
+        }
+    
+
         public Task<bool> Update(ConstructorsRacingDetail entity)
         {
             return ExecuteInTryCatch<bool>(async () =>
@@ -229,6 +242,7 @@ namespace Infrastructure.DataAccess.Repositores
                 existingConstructorRacingDetails.ConstructorChampionships = entity.ConstructorChampionships;
                 existingConstructorRacingDetails.Podiums = entity.Podiums;
                 existingConstructorRacingDetails.Constructor = originalConstructor;
+                entity.Id = existingConstructorRacingDetails.Id;
 
                 this.appContext.ConstructorsRacingDetails.Update(existingConstructorRacingDetails);
                 return true;

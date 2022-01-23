@@ -53,6 +53,7 @@ namespace WebApi
             services.AddScoped<Infrastructure.UnitOfWorks.TechnicalStuffRole.ITechnicalStaffRoleUnitOfWork, Infrastructure.UnitOfWorks.TechnicalStuffRole.TechnicalStaffRoleUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.TechnicalStuff.ITechnicalStaffUnitOfWork, Infrastructure.UnitOfWorks.TechnicalStuff.TechnicalStaffUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsStaffContracts.IConstructorsStaffContractsUnitOfWork, Infrastructure.UnitOfWorks.ConstructorsStaffContracts.ConstructorsStaffContractsUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.Competition.ICompetitionUnitOfWork, Infrastructure.UnitOfWorks.Competition.CompetitionUoW>();
 
             services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
             services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
@@ -62,6 +63,7 @@ namespace WebApi
             services.AddScoped<Domain.TechnicalStaffRole.ITechnicalStaffRoleRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRoleRepository>();
             services.AddScoped<Domain.TechnicalStaff.ITechnicalStaffRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRepository>();
             services.AddScoped<Domain.ConstructorsStaffContracts.IConstructorsStaffContractsRepository, Infrastructure.DataAccess.Repositores.ConstructorStaffContractRepository>();
+            services.AddScoped<Domain.RacingChampionship.IRacingChampionshipRepository, Infrastructure.DataAccess.Repositores.RacingChampionshipRepository>();
 
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();

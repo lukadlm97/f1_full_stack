@@ -8,6 +8,7 @@ namespace Domain.ConstructorRacingDetails
         Task<bool> CreateInitState(ConstructorsRacingDetail constructorsRacingDetail);
 
         Task<ConstructorsRacingDetail> GetById(int id);
+        Task<bool> IsCreated(int ConstructorId);
 
         Task<bool> ChangeToApproprateConstructor(int constructorId, int newConstructorId);
     }
