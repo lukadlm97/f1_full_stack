@@ -2,6 +2,7 @@
 {
     public class ConstructorRacingResultDto
     {
+        public int Id { get; set; }
         public int ConstructorChampionships { get; set; }
         public int DriverChampionships { get; set; }
         public int RaceVictories { get; set; }
