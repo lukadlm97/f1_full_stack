@@ -24,7 +24,8 @@ Timeline:
 10.	19/12/2021 - finished constructor endpoints, created Swagger documentations for API, successfully ended testing of this endpoints.
 11.	end of December 2021. - finished buissnes logic for racing result for drivers, constructors and contracts.
 12.	16/01/2022 - tiny improvments on insert new driver logic (return created driver etc. for esier handling this action on front)
-13.	18/01/2021 - completed part of API for CRUD on constructor, technical staff, and handling of contracts between constructors and technical staff with their role
+13.	18/01/2022 - completed part of API for CRUD on constructor, technical staff, and handling of contracts between constructors and technical staff with their role
+14.	23/01/2022 - created endpoint for competition fetching and bugfix on racing result for constructors
 
 
 Notes:
