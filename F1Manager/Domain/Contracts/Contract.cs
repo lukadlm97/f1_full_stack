@@ -9,7 +9,7 @@ namespace Domain.Contracts
     {
         public double EstaminateValue { get; set; }
         public int EstaminateYears { get; set; }
-        public DateTime EndOfContactDate { get; set; }
+        public DateTime? EndOfContactDate { get; set; }
         public DateTime StartOfContactDate { get; set; }
 
         [ForeignKey(nameof(ConstructorId))]

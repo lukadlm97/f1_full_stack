@@ -19,11 +19,11 @@ namespace Infrastructure.DataAccess.Repositores
             this.logger = loggerFactory.CreateLogger<ConstructorStaffContractRepository>();
         }
 
-        public Task<bool> EndContract(ConstructorsStaffContracts parameters)
+        public Task<bool> EndContract(int contractId)
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
-                var existingConstract = await context.ConstructorsStaffContracts.FirstOrDefaultAsync(x => x.ConstructorId == parameters.ConstructorId && x.TechnicalStaffId == parameters.TechnicalStaffId && x.TechnicalStaffRoleId == parameters.TechnicalStaffRoleId);
+                var existingConstract = await context.ConstructorsStaffContracts.FirstOrDefaultAsync(x=>x.Id==contractId);
 
                 if (existingConstract == null)
                 {
@@ -103,7 +103,9 @@ namespace Infrastructure.DataAccess.Repositores
                 var constructor =
                         await context.Constructors.FirstOrDefaultAsync(x => x.Id == parameters.ConstructorId);
 
-                if (stuff == null || stuffRole == null || constructor == null)
+                var isEndedPreviouse = context.ConstructorsStaffContracts.Where(x=> x.TechnicalStaffId == parameters.TechnicalStaffId).All(y => y.DateOfEnd != null);
+
+                if (stuff == null || stuffRole == null || constructor == null || !isEndedPreviouse)
                 {
                     return false;
                 }
@@ -148,6 +150,15 @@ namespace Infrastructure.DataAccess.Repositores
                 return await context.ConstructorsStaffContracts.Include(x => x.Constructor).Include(x => x.TechnicalStaff)
                 .Include(x => x.TechnicalStaffRole).Where(x => x.ConstructorId == constructorId && x.DateOfEnd != null).ToListAsync();
             }, "GetCurrentStuff ConstructorsStuffContracts");
+        }
+
+        public Task<bool> IsNotUnderContract(int staffId)
+        {
+            return ExecuteInTryCatch<bool>(async () =>
+            {
+                return context.ConstructorsStaffContracts.Where(x => x.TechnicalStaffId == staffId)
+                                                            .All(y => y.DateOfEnd != null);
+            }, "IsStillUnderContract ConstructorsStuffContracts");
         }
     }
 }

@@ -97,8 +97,17 @@ namespace WebApi.Controllers
         [HttpPost("start")]
         public async Task<IActionResult> StartContract([FromBody]Domain.ConstructorsStaffContracts.ConstructorsStaffContracts contract)
         {
+            if(!await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts
+                            .IsNotUnderContract(contract.TechnicalStaffId))
+            {
+                return Conflict("Staff is in contract");
+            }
+
+
             if (!await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts.InsertContract(contract))
+            {
                 return BadRequest("contract not inserted!!!");
+            }
 
             if (await this.constructorsStaffContractsUnitOfWork.Commit() == 0)
             {
@@ -110,10 +119,10 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpPost("end")]
-        public async Task<IActionResult> EndContract([FromBody] Domain.ConstructorsStaffContracts.ConstructorsStaffContracts contract)
+        [HttpPost("endContract/{contractId}")]
+        public async Task<IActionResult> EndContract(int contractId)
         {
-            if (!await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts.EndContract(contract))
+            if (!await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts.EndContract(contractId))
                 return BadRequest("contract not ended!!!");
 
             if (await this.constructorsStaffContractsUnitOfWork.Commit() == 0)
@@ -122,7 +131,7 @@ namespace WebApi.Controllers
             }
 
 
-            return Ok(await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts.GetById(contract.Id));
+            return Ok(await this.constructorsStaffContractsUnitOfWork.ConstructorsStaffContracts.GetById(contractId));
         }
 
     }

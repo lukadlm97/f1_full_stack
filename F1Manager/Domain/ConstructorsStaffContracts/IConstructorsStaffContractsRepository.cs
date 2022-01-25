@@ -11,7 +11,8 @@ namespace Domain.ConstructorsStaffContracts
         Task<IEnumerable<ConstructorsStaffContracts>> GetAll();
         Task<ConstructorsStaffContracts> GetById(int id);
         Task<bool> InsertContract(ConstructorsStaffContracts parameters);
-        Task<bool> EndContract(ConstructorsStaffContracts parameters);
+        Task<bool> EndContract(int contractId);
+        Task<bool> IsNotUnderContract(int staffId);
         Task<IEnumerable<ConstructorsStaffContracts>> GetCurrentStuff(int constructorId);
         Task<IEnumerable<ConstructorsStaffContracts>> GetHistoryStuff(int constructorId);
         Task<ConstructorsStaffContracts> GetCurrentPosition(int stuffId);
