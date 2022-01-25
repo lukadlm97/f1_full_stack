@@ -25,6 +25,8 @@ namespace Infrastructure.DataAccess
         public DbSet<Domain.TechnicalStaff.TechnicalStaff> TechnicalStaffs { get; set; }
         public DbSet<Domain.ConstructorsStaffContracts.ConstructorsStaffContracts> ConstructorsStaffContracts { get; set; }
         public DbSet<Domain.TechnicalStaffRole.TechnicalStaffRole> TechnicalStaffRoles { get; set; }
+        public DbSet<Domain.PoweUnitSupplier.PowerUnitSupplier> PowerUnitSuppliers { get; set; }
+        public DbSet<Domain.ConstructorsPowerUnits.ConstructorPowerUnit> ConstructorPowerUnits { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -50,7 +52,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Entity<Domain.ConstructorsStaffContracts.ConstructorsStaffContracts>().HasOne(x => x.Constructor);
             modelBuilder.Entity<Domain.ConstructorsStaffContracts.ConstructorsStaffContracts>().HasOne(x => x.TechnicalStaff);
             modelBuilder.Entity<Domain.ConstructorsStaffContracts.ConstructorsStaffContracts>().HasOne(x => x.TechnicalStaffRole);
-            
+            modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.Constructor);
+            modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.PowerUnitSupplier);
 
         }
     }

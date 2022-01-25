@@ -55,6 +55,8 @@ namespace WebApi
             services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsStaffContracts.IConstructorsStaffContractsUnitOfWork, Infrastructure.UnitOfWorks.ConstructorsStaffContracts.ConstructorsStaffContractsUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.Competition.ICompetitionUnitOfWork, Infrastructure.UnitOfWorks.Competition.CompetitionUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.DriversContract.IDriversContractUnitOfWork, Infrastructure.UnitOfWorks.DriversContract.DriversContractUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.PowerUnitSupplier.IPowerUnitSupplierUnitOfWork, Infrastructure.UnitOfWorks.PowerUnitSupplier.PowerUnitSupplierUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsPowerUnit.IConstructorsPowerUnit, Infrastructure.UnitOfWorks.ConstructorsPowerUnit.ConstructorsPowerUnitUoW>();
 
             services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
             services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
@@ -65,8 +67,9 @@ namespace WebApi
             services.AddScoped<Domain.TechnicalStaff.ITechnicalStaffRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRepository>();
             services.AddScoped<Domain.ConstructorsStaffContracts.IConstructorsStaffContractsRepository, Infrastructure.DataAccess.Repositores.ConstructorStaffContractRepository>();
             services.AddScoped<Domain.RacingChampionship.IRacingChampionshipRepository, Infrastructure.DataAccess.Repositores.RacingChampionshipRepository>();
-            services.AddScoped<Domain.Contracts.IContractRepository, 
-                            Infrastructure.DataAccess.Repositores.ContractRepository>();
+            services.AddScoped<Domain.Contracts.IContractRepository,                             Infrastructure.DataAccess.Repositores.ContractRepository>();
+            services.AddScoped<Domain.PoweUnitSupplier.IPowerUnitSupplier,                             Infrastructure.DataAccess.Repositores.PowerUnitSupplierRepository>();
+            services.AddScoped<Domain.ConstructorsPowerUnits.IConstructorsPowerUnit,                             Infrastructure.DataAccess.Repositores.ConstructorsPowerUnitRepository>();
 
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
