@@ -40,7 +40,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<List<PowerUnitSupplier>>(async () =>
             {
-                return context.PowerUnitSuppliers.ToList();
+                return context.PowerUnitSuppliers.Where(x=>x.IsActive).ToList();
             }, "GetAll Drivers");
         }
 
@@ -56,6 +56,14 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<bool>(async () =>
             {
+                var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == entity.CountryId);
+
+                if(country == null)
+                {
+                    return false;
+                }
+                entity.Country = country;
+
                 await context.PowerUnitSuppliers.AddAsync(entity);
 
                 return true;
@@ -71,7 +79,14 @@ namespace Infrastructure.DataAccess.Repositores
                 {
                     return false;
                 }
+                var country = await context.Countries.FirstOrDefaultAsync(x => x.Id == entity.CountryId);
 
+                if (country == null)
+                {
+                    return false;
+                }
+
+                existingPowerUnitSupplier.Country = country;
                 existingPowerUnitSupplier.IsActive = entity.IsActive;
                 existingPowerUnitSupplier.SupplierName = entity.SupplierName;
                 context.PowerUnitSuppliers.Update(existingPowerUnitSupplier);

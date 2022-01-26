@@ -63,10 +63,13 @@ namespace WebApi.Controllers
         }
 
         [MapToApiVersion("1.0")]
-        [HttpDelete("")]
-        public async Task<IActionResult> Delete([FromBody] Domain.PoweUnitSupplier.PowerUnitSupplier powerUnitSupplierId)
+        [HttpDelete("{powerUnitId}")]
+        public async Task<IActionResult> Delete(int powerUnitId)
         {
-            if (!await this.powerUnitSupplierUoW.PowerUnitSupplier.Delete(powerUnitSupplierId))
+            if (!await this.powerUnitSupplierUoW.PowerUnitSupplier.Delete(new Domain.PoweUnitSupplier.PowerUnitSupplier()
+            {
+                Id=powerUnitId
+            }))
             {
                 return NotFound("No registered drivers.");
             }
@@ -76,7 +79,7 @@ namespace WebApi.Controllers
                 return BadRequest("Driver insert not confirmed!!!");
             }
 
-            return Ok(await this.powerUnitSupplierUoW.PowerUnitSupplier.GetById(powerUnitSupplierId.Id));
+            return Ok(await this.powerUnitSupplierUoW.PowerUnitSupplier.GetById(powerUnitId));
         }
 
 

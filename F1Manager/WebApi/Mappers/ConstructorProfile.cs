@@ -8,6 +8,8 @@ namespace WebApi.Mappers
         public ConstructorProfile()
         {
             CreateMap<DTOs.Constructors.ConstructorDto, Domain.Constructors.Constructor>();
+            CreateMap<DTOs.ConstructorPowerUnit.ConstructorPowerUnit, Domain.ConstructorsPowerUnits.ConstructorPowerUnit>()
+                ;
         }
     }
 }

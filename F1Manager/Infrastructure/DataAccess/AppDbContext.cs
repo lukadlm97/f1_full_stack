@@ -54,6 +54,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Entity<Domain.ConstructorsStaffContracts.ConstructorsStaffContracts>().HasOne(x => x.TechnicalStaffRole);
             modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.Constructor);
             modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.PowerUnitSupplier);
+            modelBuilder.Entity<Domain.PoweUnitSupplier.PowerUnitSupplier>().HasOne(x => x.Country);
 
         }
     }
