@@ -77,6 +77,7 @@ namespace Infrastructure.DataAccess.Repositores
 
             }, "GetAll Drivers");
         }
+        
 
         public Task<ConstructorPowerUnit> GetCurrentConstructorPowerUnit(int constructorId)
         {

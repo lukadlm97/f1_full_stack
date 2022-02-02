@@ -80,6 +80,28 @@ namespace WebApi.Controllers
             return Ok(await this.constructorsPowerUnit.ConstructorsPowerUnit.GetById(contractId));
         }
 
+        [HttpPost("changeSupplier/{contractId}")]
+        public async Task<IActionResult> ChangePowerUnitSupplier(int contractId, [FromBody] DTOs.ConstructorPowerUnit.ConstructorPowerUnit contract)
+        {
+            if (!await this.constructorsPowerUnit.ConstructorsPowerUnit.EndContract(contractId))
+                return BadRequest("contract not ended!!!");
+
+            var mappedObj = mapper.Map<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>(contract);
+            if (!await this.constructorsPowerUnit.ConstructorsPowerUnit.CreateNewContract(mappedObj))
+            {
+                return BadRequest("contract not inserted!!!");
+            }
+
+            if (await this.constructorsPowerUnit.Commit() == 0)
+            {
+                return BadRequest("contract end not confirmed!!!");
+            }
+
+
+            return Ok(await this.constructorsPowerUnit.ConstructorsPowerUnit.GetById(mappedObj.Id));
+        }
+
+
 
     }
 }
