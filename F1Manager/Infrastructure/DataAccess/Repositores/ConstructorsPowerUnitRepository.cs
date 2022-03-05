@@ -83,7 +83,7 @@ namespace Infrastructure.DataAccess.Repositores
         {
             return ExecuteInTryCatch<ConstructorPowerUnit>(async () =>
             {
-                return await context.ConstructorPowerUnits.FirstOrDefaultAsync(x => x.ConstructorId == constructorId);
+                return await context.ConstructorPowerUnits.FirstOrDefaultAsync(x => x.ConstructorId == constructorId && x.EndDate==null);
               
             }, "GetAll Drivers");
         }
