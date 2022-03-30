@@ -15,7 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
 using WebApi.Extensions;
-using WebApi.Utilities;
 
 namespace WebApi
 {
@@ -57,6 +56,7 @@ namespace WebApi
             services.AddScoped<Infrastructure.UnitOfWorks.DriversContract.IDriversContractUnitOfWork, Infrastructure.UnitOfWorks.DriversContract.DriversContractUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.PowerUnitSupplier.IPowerUnitSupplierUnitOfWork, Infrastructure.UnitOfWorks.PowerUnitSupplier.PowerUnitSupplierUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsPowerUnit.IConstructorsPowerUnit, Infrastructure.UnitOfWorks.ConstructorsPowerUnit.ConstructorsPowerUnitUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.DriverRole.IDriverRoleUnitOfWork, Infrastructure.UnitOfWorks.DriverRole.DriverRoleUoW>();
 
             services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
             services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
@@ -67,13 +67,12 @@ namespace WebApi
             services.AddScoped<Domain.TechnicalStaff.ITechnicalStaffRepository, Infrastructure.DataAccess.Repositores.TechnicalStaffRepository>();
             services.AddScoped<Domain.ConstructorsStaffContracts.IConstructorsStaffContractsRepository, Infrastructure.DataAccess.Repositores.ConstructorStaffContractRepository>();
             services.AddScoped<Domain.RacingChampionship.IRacingChampionshipRepository, Infrastructure.DataAccess.Repositores.RacingChampionshipRepository>();
-            services.AddScoped<Domain.Contracts.IContractRepository,                             Infrastructure.DataAccess.Repositores.ContractRepository>();
-            services.AddScoped<Domain.PoweUnitSupplier.IPowerUnitSupplier,                             Infrastructure.DataAccess.Repositores.PowerUnitSupplierRepository>();
-            services.AddScoped<Domain.ConstructorsPowerUnits.IConstructorsPowerUnit,                             Infrastructure.DataAccess.Repositores.ConstructorsPowerUnitRepository>();
-
+            services.AddScoped<Domain.Contracts.IContractRepository, Infrastructure.DataAccess.Repositores.ContractRepository>();
+            services.AddScoped<Domain.PoweUnitSupplier.IPowerUnitSupplier, Infrastructure.DataAccess.Repositores.PowerUnitSupplierRepository>();
+            services.AddScoped<Domain.ConstructorsPowerUnits.IConstructorsPowerUnit, Infrastructure.DataAccess.Repositores.ConstructorsPowerUnitRepository>();
+            services.AddScoped<Domain.DriverRoles.IDriverRolesRepository, Infrastructure.DataAccess.Repositores.DriverRolesRepository>();
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
-
 
             // Auto Mapper Configurations
             var mapperConfig = new MapperConfiguration(mc =>
@@ -86,7 +85,6 @@ namespace WebApi
 
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
-
 
             services.AddScoped<Application.Services.IUserService, Infrastructure.Authentication.UserService>();
             services.AddScoped<Application.Services.IJWTService, Infrastructure.Authentication.JWTService>();
@@ -122,12 +120,12 @@ namespace WebApi
                     options.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     options.Requirements.Add(new Infrastructure.Authentication.Requirements.ShouldBeAAdminRequirement());
                 });
-               /* options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
-                options.AddPolicy("ContentChanges", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.ContentWriter));
-                //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));*/
+                /* options.AddPolicy("CanViewHome", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.User, Constants.Strings.JwtClaims.ContentWriter, Constants.Strings.JwtClaims.PremiumUser));
+                 options.AddPolicy("ContentChanges", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Role, Constants.Strings.JwtClaims.Admin, Constants.Strings.JwtClaims.ContentWriter));
+                 //options.AddPolicy("CanViewUsers", policy => policy.Requirements.Add(new RoleRequirement("Admin")));*/
             });
 
-            services.AddSingleton<IAuthorizationHandler, Infrastructure.Authentication.Handlers.ShouldBeAAdminAuthorizationHandler> ();
+            services.AddSingleton<IAuthorizationHandler, Infrastructure.Authentication.Handlers.ShouldBeAAdminAuthorizationHandler>();
 
             services.AddApiVersioning(setup =>
             {
@@ -154,7 +152,6 @@ namespace WebApi
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SuperfundInvest v1"));
-
 
                 app.UseDeveloperExceptionPage();
                 app.UseSerilogRequestLogging();

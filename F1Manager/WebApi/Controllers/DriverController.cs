@@ -12,11 +12,13 @@ namespace WebApi.Controllers
     public class DriverController : ControllerBase
     {
         private readonly Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork;
+        private readonly Infrastructure.UnitOfWorks.DriverRole.IDriverRoleUnitOfWork driverRoleUnitOfWork;
         private readonly IMapper mapper;
 
-        public DriverController(Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork, IMapper mapper)
+        public DriverController(Infrastructure.UnitOfWorks.Drivers.IDriversUnitOfWork driversUnitOfWork, IMapper mapper, Infrastructure.UnitOfWorks.DriverRole.IDriverRoleUnitOfWork driverRoleUnitOfWork)
         {
             this.driversUnitOfWork = driversUnitOfWork;
+            this.driverRoleUnitOfWork = driverRoleUnitOfWork;
             this.mapper = mapper;
         }
 
@@ -165,5 +167,20 @@ namespace WebApi.Controllers
 
             return Ok(await this.driversUnitOfWork.Drivers.GetById(id));
         }
+
+
+        [MapToApiVersion("1.0")]
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles(CancellationToken cancellationToken = default)
+        {
+            var driverRoles = await this.driverRoleUnitOfWork.DriverRolesRepository.GetAll();
+
+            if (driverRoles == null)
+                return NotFound("No registered drivers roles.");
+
+            return Ok(driverRoles);
+        }
+
+
     }
 }
