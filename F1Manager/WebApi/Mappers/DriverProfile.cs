@@ -13,7 +13,7 @@ namespace WebApi.Mappers
             CreateMap<DTOs.DriversContracts.DriversContractDto, Domain.Contracts.Contract>()
                 .ForMember(dest => dest.ConstructorId, opt => opt.MapFrom(src => src.ConstructorId))
                 .ForMember(dest => dest.DriverId, opt => opt.MapFrom(src => src.DriverId))
-                .ForMember(dest => dest.DriverRolesId, opt => opt.MapFrom(src => src.DriverRoleId));
+                .ForMember(dest => dest.DriverRolesId, opt => opt.MapFrom(src => src.DriverRolesId));
         }
     }
 }
