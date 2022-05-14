@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace WebApi.Controllers
@@ -24,7 +25,7 @@ namespace WebApi.Controllers
             if (technicans == null)
                 return NotFound("No registered techical staff.");
 
-            return Ok(technicans);
+            return Ok(technicans.OrderBy(x=>x.TechnicalStaffRoleId));
         }
 
         [HttpGet("history")]
@@ -35,7 +36,7 @@ namespace WebApi.Controllers
             if (technicans == null)
                 return NotFound("No registered techical staff.");
 
-            return Ok(technicans);
+            return Ok(technicans.OrderBy(x=>x.DateOfEnd));
         }
 
 
@@ -58,7 +59,7 @@ namespace WebApi.Controllers
             if (technicans == null)
                 return NotFound("No registered techical staff.");
 
-            return Ok(technicans);
+            return Ok(technicans.OrderBy(x=>x.TechnicalStaffRoleId));
         }
 
         [HttpGet("constructor/{constructorId}/history")]

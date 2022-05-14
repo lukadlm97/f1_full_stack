@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace WebApi.Controllers
             if (drivers == null)
                 return NotFound("No registered drivers.");
 
-            return Ok(drivers);
+            return Ok(drivers.OrderBy(x=>x.DriverRolesId));
         }
 
         [MapToApiVersion("1.0")]
@@ -40,7 +41,7 @@ namespace WebApi.Controllers
             if (drivers == null)
                 return NotFound("No registered drivers.");
 
-            return Ok(drivers);
+            return Ok(drivers.OrderBy(x=>x.DriverRolesId).OrderBy(x=>x.EndOfContactDate));
         }
 
         [MapToApiVersion("1.0")]
