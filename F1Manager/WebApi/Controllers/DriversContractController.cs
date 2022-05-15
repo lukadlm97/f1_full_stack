@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApi.Controllers
@@ -29,7 +29,7 @@ namespace WebApi.Controllers
             if (drivers == null)
                 return NotFound("No registered drivers.");
 
-            return Ok(drivers.OrderBy(x=>x.DriverRolesId));
+            return Ok(drivers.OrderBy(x => x.DriverRolesId));
         }
 
         [MapToApiVersion("1.0")]
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
             if (drivers == null)
                 return NotFound("No registered drivers.");
 
-            return Ok(drivers.OrderBy(x=>x.DriverRolesId).OrderBy(x=>x.EndOfContactDate));
+            return Ok(drivers.OrderBy(x => x.DriverRolesId).OrderBy(x => x.EndOfContactDate));
         }
 
         [MapToApiVersion("1.0")]
@@ -72,12 +72,6 @@ namespace WebApi.Controllers
         public async Task<IActionResult> StartContract([FromBody] DTOs.DriversContracts.DriversContractDto contract)
         {
             var newContract = mapper.Map<Domain.Contracts.Contract>(contract);
-            if (!await this.driversUnitOfWork.DriversContract
-                            .IsNotUnderContract(newContract.DriverId))
-            {
-                return Conflict("Staff is in contract");
-            }
-
 
             if (!await this.driversUnitOfWork.DriversContract.StartContract(newContract))
             {
@@ -88,7 +82,6 @@ namespace WebApi.Controllers
             {
                 return BadRequest("contract insert not confirmed!!!");
             }
-
 
             return Ok(await this.driversUnitOfWork.DriversContract.GetById(newContract.Id));
         }
@@ -106,7 +99,5 @@ namespace WebApi.Controllers
 
             return Ok(await this.driversUnitOfWork.DriversContract.GetById(contractId));
         }
-
-
     }
 }

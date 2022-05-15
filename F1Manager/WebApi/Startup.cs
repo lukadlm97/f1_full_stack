@@ -31,7 +31,17 @@ namespace WebApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllHeaders",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+
             services.AddControllers().AddNewtonsoftJson(s =>
             {
                 s.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -157,14 +167,10 @@ namespace WebApi
                 app.UseSerilogRequestLogging();
             }
 
-            app.UseCors(x => x
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetIsOriginAllowed(origin => true) // allow any origin
-               );
-
+            app.UseHttpsRedirection();
             app.UseAuthentication();
-            app.UseRouting();
+            app.UseRouting(); 
+            app.UseCors("AllowAllHeaders");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
