@@ -181,6 +181,19 @@ namespace WebApi.Controllers
             return Ok(driverRoles);
         }
 
+        [MapToApiVersion("1.0")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDriverById(int id, CancellationToken cancellationToken = default)
+        {
+            var driver = await this.driversUnitOfWork.Drivers.GetById(id);
+
+            if (driver == null)
+                return NotFound($"No registered driver for id={id}.");
+
+            return Ok(driver);
+        }
+
+
 
     }
 }
