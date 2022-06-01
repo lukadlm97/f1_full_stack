@@ -69,6 +69,14 @@ namespace Infrastructure.DataAccess.Repositores
             }, "GetAll Constructors");
         }
 
+        public Task<Constructor> GetById(int id)
+        {
+            return ExecuteInTryCatch<Constructor>(async () =>
+            {
+                return await this.context.Constructors.FirstOrDefaultAsync(x => x.Id==id);
+            }, "GetAll Constructors");
+        }
+
         public Task<bool> Insert(Constructor entity)
         {
             return ExecuteInTryCatch<bool>(async () =>

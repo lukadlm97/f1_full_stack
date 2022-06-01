@@ -35,6 +35,18 @@ namespace WebApi.Controllers
             return Ok(constructors);
         }
 
+        [MapToApiVersion("1.0")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSingleConstructor(int id)
+        {
+            var constructor = await this.constructorsUnitOfWork.Constructors.GetById(id);
+
+            if (constructor == null)
+                return NotFound("No registered constructor.");
+
+            return Ok(constructor);
+        }
+
         //POST: api/constructors/create
 
         [MapToApiVersion("1.0")]
