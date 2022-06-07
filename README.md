@@ -10,7 +10,8 @@ The domain of the project is Formula 1 competition. I wanna create the applicati
 In the system, I will have more roles with implemented authentification and authorisation mechanisms.
 
 Current status at trello:
-![image](https://user-images.githubusercontent.com/36825550/172467889-bbfc544a-a94e-4e8d-92bd-8559e6963eb6.png)
+![image](https://user-images.githubusercontent.com/36825550/172478993-342e3fcc-d1f3-43e0-a27b-7215c4e1bdad.png)
+
 
 Timeline:
 ------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +29,7 @@ Timeline:
 12.	16/01/2022 - tiny improvments on insert new driver logic (return created driver etc. for esier handling this action on front)
 13.	18/01/2022 - completed part of API for CRUD on constructor, technical staff, and handling of contracts between constructors and technical staff with their role
 14.	23/01/2022 - created endpoint for competition fetching and bugfix on racing result for constructors
+15.	07/06/2022 - made comeback to project with better task organization and analyse of architecture to make part with competition, result, raceweeks, seasons, calendars more practical
 
 
 Notes:
