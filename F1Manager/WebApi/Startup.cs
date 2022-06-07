@@ -66,7 +66,7 @@ namespace WebApi
             services.AddScoped<Infrastructure.UnitOfWorks.DriversContract.IDriversContractUnitOfWork, Infrastructure.UnitOfWorks.DriversContract.DriversContractUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.PowerUnitSupplier.IPowerUnitSupplierUnitOfWork, Infrastructure.UnitOfWorks.PowerUnitSupplier.PowerUnitSupplierUoW>();
             services.AddScoped<Infrastructure.UnitOfWorks.ConstructorsPowerUnit.IConstructorsPowerUnit, Infrastructure.UnitOfWorks.ConstructorsPowerUnit.ConstructorsPowerUnitUoW>();
-            services.AddScoped<Infrastructure.UnitOfWorks.DriverRole.IDriverRoleUnitOfWork, Infrastructure.UnitOfWorks.DriverRole.DriverRoleUoW>();
+            services.AddScoped<Infrastructure.UnitOfWorks.DriverRole.IDriverRoleUnitOfWork, Infrastructure.UnitOfWorks.DriverRole.DriverRoleUoW>(); services.AddScoped<Infrastructure.UnitOfWorks.Season.ISeasonUnitOfWork, Infrastructure.UnitOfWorks.Season.SeasonUoW>();
 
             services.AddScoped<Domain.Users.IUserRepository, Infrastructure.DataAccess.Repositores.UserRepository>();
             services.AddScoped<Domain.Constructors.IConstructorRepository, Infrastructure.DataAccess.Repositores.ConstructorRepository>();
@@ -81,6 +81,8 @@ namespace WebApi
             services.AddScoped<Domain.PoweUnitSupplier.IPowerUnitSupplier, Infrastructure.DataAccess.Repositores.PowerUnitSupplierRepository>();
             services.AddScoped<Domain.ConstructorsPowerUnits.IConstructorsPowerUnit, Infrastructure.DataAccess.Repositores.ConstructorsPowerUnitRepository>();
             services.AddScoped<Domain.DriverRoles.IDriverRolesRepository, Infrastructure.DataAccess.Repositores.DriverRolesRepository>();
+            services.AddScoped<Domain.Season.ISeasonRepository, Infrastructure.DataAccess.Repositores.SeasonRepository>();
+
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -161,10 +163,21 @@ namespace WebApi
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SuperfundInvest v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "F1 Manager v1");
+                    c.SwaggerEndpoint("/swagger/v2/swagger.json", "F1 Manager v2");
+                });
+
+                app.UseReDoc(c =>
+                {
+                    c.DocumentTitle = "F1 Manager API Documentation";
+                    c.SpecUrl = "/swagger/v1/swagger.json";
+                });
 
                 app.UseDeveloperExceptionPage();
                 app.UseSerilogRequestLogging();
+
             }
 
             app.UseHttpsRedirection();

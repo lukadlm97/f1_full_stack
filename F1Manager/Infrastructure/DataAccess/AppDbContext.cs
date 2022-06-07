@@ -27,6 +27,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Domain.TechnicalStaffRole.TechnicalStaffRole> TechnicalStaffRoles { get; set; }
         public DbSet<Domain.PoweUnitSupplier.PowerUnitSupplier> PowerUnitSuppliers { get; set; }
         public DbSet<Domain.ConstructorsPowerUnits.ConstructorPowerUnit> ConstructorPowerUnits { get; set; }
+        public DbSet<Domain.Season.Season> Seasons { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -55,6 +56,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.Constructor);
             modelBuilder.Entity<Domain.ConstructorsPowerUnits.ConstructorPowerUnit>().HasOne(x => x.PowerUnitSupplier);
             modelBuilder.Entity<Domain.PoweUnitSupplier.PowerUnitSupplier>().HasOne(x => x.Country);
+            modelBuilder.Entity<Domain.Season.Season>().HasOne(x => x.RacingChampionship);
 
         }
     }
